@@ -95,8 +95,11 @@ export default function UserMenu() {
     </DropdownMenu>
   ) : (
     <div className='pb-1'>
-      <Button className='bg-blue-900 dark:bg-white dark:hover:bg-gray-300 hover:bg-blue-950 '>
-        Sign In
+      <Button
+        asChild
+        className='bg-blue-900 dark:bg-white dark:hover:bg-gray-300 hover:bg-blue-950 '
+      >
+        <Link href='/signin'>Sign In</Link>
       </Button>
     </div>
   );

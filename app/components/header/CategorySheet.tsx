@@ -30,13 +30,19 @@ const CategorySheet = ({ openSheet, setOpenSheet }: CategorySheetProps) => {
               href=''
               className='hover:bg-blue-50 text-black dark:text-white dark:hover:bg-gray-100/30 cursor-pointer rounded-md p-3'
             >
-              Mens Dress Shirts (5)
+              Men&apos;s Dress Shirts (5)
             </Link>
             <Link
               href=''
               className='hover:bg-blue-50 text-black dark:text-white dark:hover:bg-gray-100/30 cursor-pointer rounded-md p-3'
             >
-              Mens Sweat Shirts (1)
+              Men&apos;s Sweat Shirts (1)
+            </Link>
+            <Link
+              href=''
+              className='hover:bg-blue-50 text-black dark:text-white dark:hover:bg-gray-100/30 cursor-pointer rounded-md p-3'
+            >
+              Men&apos;s Sneakers (1)
             </Link>
           </div>
         </div>
