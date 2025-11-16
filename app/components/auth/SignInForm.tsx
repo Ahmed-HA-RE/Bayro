@@ -17,12 +17,13 @@ import { FaGithub } from 'react-icons/fa6';
 import Link from 'next/link';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signInUser } from '@/app/actions/auth';
+
 import { type SignInUserForm, signInSchema } from '@/schema/userSchema';
 import { useState } from 'react';
 import ScreenSpinner from '../ScreenSpinner';
 import { useRouter } from 'next/navigation';
 import { Checkbox } from '../ui/checkbox';
+import { authClient } from '@/lib/authClient';
 
 const SignInForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
   const [isPending, setIsPending] = useState(false);
@@ -37,19 +38,19 @@ const SignInForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
     mode: 'all',
   });
 
-  const onSubmit = async (data: SignInUserForm) => {
+  const onSubmit = async (values: SignInUserForm) => {
     setIsPending(true);
-    const result = await signInUser(data);
-    if (result?.success && result.message) {
-      successToast(result.message);
-      setTimeout(() => router.push('/'), 1500);
-    } else if (result && !result.success && result.message) {
-      destructiveToast(result.message);
-      setIsPending(false);
+    const { error } = await authClient.signIn.email(values);
 
+    if (error && error.message) {
+      destructiveToast(error.message);
+      setIsPending(false);
       return;
+    } else {
+      setIsPending(false);
+      successToast('Sign in successful! Redirecting...');
+      setTimeout(() => router.push('/'), 1500);
     }
-    setIsPending(false);
   };
 
   return (

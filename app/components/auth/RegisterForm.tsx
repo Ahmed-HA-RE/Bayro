@@ -14,11 +14,11 @@ import { Input } from '@/app/components/ui/input';
 import Link from 'next/link';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { registerUser } from '@/app/actions/auth';
 import { type RegisterUserForm, registerSchema } from '@/schema/userSchema';
 import { useState } from 'react';
 import ScreenSpinner from '../ScreenSpinner';
 import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/authClient';
 
 const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
   const [isPending, setIsPending] = useState(false);
@@ -34,18 +34,19 @@ const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
     mode: 'all',
   });
 
-  const onSubmit = async (data: RegisterUserForm) => {
+  const onSubmit = async (values: RegisterUserForm) => {
     setIsPending(true);
-    const result = await registerUser(data);
-    if (result?.success && result.message) {
-      successToast(result.message);
-      setTimeout(() => router.push('/'), 1500);
-    } else if (!result?.success && result?.message) {
-      destructiveToast(result.message);
+    const { error } = await authClient.signUp.email(values);
+
+    if (error && error.message) {
+      destructiveToast(error.message);
       setIsPending(false);
       return;
+    } else {
+      setIsPending(false);
+      successToast('Sign in successful! Redirecting...');
+      setTimeout(() => router.push('/'), 1500);
     }
-    setIsPending(false);
   };
 
   return (
