@@ -27,3 +27,11 @@ export const registerSchema = z
   });
 
 export type RegisterUserForm = z.infer<typeof registerSchema>;
+
+export const signInSchema = z.object({
+  email: registerSchema.shape.email,
+  password: registerSchema.shape.password,
+  rememberMe: z.boolean(),
+});
+
+export type SignInUserForm = z.infer<typeof signInSchema>;

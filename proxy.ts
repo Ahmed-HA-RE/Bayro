@@ -9,8 +9,10 @@ export const proxy = async (req: NextRequest) => {
 
   if (session && session.user.role !== 'admin') {
     return NextResponse.redirect(new URL('/', req.url));
+  } else if (session && session.user.role !== 'admin') {
+    return NextResponse.redirect(new URL('/', req.url));
   }
 };
 export const config = {
-  matcher: ['/register'],
+  matcher: ['/register', '/signin'],
 };

@@ -9,11 +9,8 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
 } from '@/app/components/ui/field';
 import { Input } from '@/app/components/ui/input';
-import { FcGoogle } from 'react-icons/fc';
-import { FaGithub } from 'react-icons/fa6';
 import Link from 'next/link';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,20 +35,17 @@ const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
   });
 
   const onSubmit = async (data: RegisterUserForm) => {
-    try {
-      setIsPending(true);
-      const result = await registerUser(data);
-      if (result.success && result.message) {
-        successToast(result.message);
-      }
+    setIsPending(true);
+    const result = await registerUser(data);
+    if (result?.success && result.message) {
+      successToast(result.message);
       setTimeout(() => router.push('/'), 1500);
-    } catch (error) {
-      if (error instanceof Error) {
-        destructiveToast(error.message);
-      }
-    } finally {
+    } else if (!result?.success && result?.message) {
+      destructiveToast(result.message);
       setIsPending(false);
+      return;
     }
+    setIsPending(false);
   };
 
   return (
@@ -158,27 +152,12 @@ const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
                   </Field>
                 </Field>
                 <Field>
-                  <Button type='submit'>Create Account</Button>
-                </Field>
-                <FieldSeparator>Or continue with</FieldSeparator>
-                <Field className='grid grid-cols-2 gap-4'>
-                  <Button
-                    className="bg-white hover:bg-white/85 border-black/50 [&_svg:not([class*='size-'])]:size-6"
-                    variant='outline'
-                    aria-label='Login with Google'
-                  >
-                    <FaGithub className='text-black' aria-hidden='true' />
-                  </Button>
-                  <Button
-                    className="bg-white hover:bg-white/85 border-black/50 [&_svg:not([class*='size-'])]:size-6"
-                    variant='outline'
-                    aria-label='Login with Google'
-                  >
-                    <FcGoogle aria-hidden='true' />
+                  <Button disabled={isPending} type='submit'>
+                    Create Account
                   </Button>
                 </Field>
                 <FieldDescription className='text-center'>
-                  Already have an account? <Link href='/signin'>Sign in</Link>
+                  Already have an account? <Link href='/signin'>Sign In</Link>
                 </FieldDescription>
               </FieldGroup>
             </form>
