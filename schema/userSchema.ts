@@ -35,3 +35,25 @@ export const signInSchema = z.object({
 });
 
 export type SignInUserForm = z.infer<typeof signInSchema>;
+
+export const resetPassSchema = z
+  .object({
+    password: z
+      .string({ error: 'Invalid password' })
+      .min(6, 'Password must be at least 6 characters long')
+      .regex(
+        /^(?=.*[a-z]).*$/,
+        'Password must contain at least one lowercase letter'
+      )
+      .regex(
+        /^(?=.*[A-Z]).*$/,
+        'Password must contain at least one uppercase letter'
+      ),
+    confirmPassword: z.string({ error: 'Invalid password confirmation' }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    error: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
+export type ResetPassword = z.infer<typeof resetPassSchema>;

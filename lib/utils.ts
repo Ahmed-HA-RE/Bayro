@@ -32,3 +32,14 @@ export const destructiveToast = (message: string | undefined) => {
     } as React.CSSProperties,
   });
 };
+
+export const infoToast = (message: string | undefined) => {
+  toast.info(message, {
+    style: {
+      '--normal-bg':
+        'color-mix(in oklab, var(--color-blue-500) 10%, var(--background))',
+      '--normal-text': 'var(--color-blue-500)',
+      '--normal-border': 'var(--color-blue-500)',
+    } as React.CSSProperties,
+  });
+};

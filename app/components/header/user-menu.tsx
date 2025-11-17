@@ -67,6 +67,7 @@ const UserMenu = ({
       router.push('/signin');
       setIsPending(false);
     }
+    setIsPending(false);
   };
 
   return (
@@ -136,5 +137,4 @@ const UserMenu = ({
     </>
   );
 };
-
 export default UserMenu;

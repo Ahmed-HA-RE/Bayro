@@ -33,8 +33,8 @@ const VerificationPage = async ({
               : 'Your verification link has expired or is invalid. Please request a new one.'}
           </p>
           <Button asChild className='h-11 text-base'>
-            <Link href={isSuccess ? '/' : '/forgot-password'}>
-              {isSuccess ? 'Return to homepage' : 'Request new one'}
+            <Link href={isSuccess ? '/signin' : '/forgot-password'}>
+              {isSuccess ? 'Return to Sign in' : 'Request new one'}
             </Link>
           </Button>
         </div>

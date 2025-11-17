@@ -31,7 +31,7 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 6,
     maxPasswordLength: 100,
-    sendResetPassword: async ({ user, url, token }, request) => {
+    sendResetPassword: async ({ user, url }) => {
       await resend.emails.send({
         from: 'Veloria <noreply@ahmedrehandev.net>',
         replyTo: process.env.REPLY_TO_GMAIL,
@@ -42,10 +42,6 @@ export const auth = betterAuth({
           resetPasswordLink: url,
         }),
       });
-    },
-    onPasswordReset: async (data, request) => {
-      // console.log(request);
-      // request?.redirect('/verification?status=true');
     },
     resetPasswordTokenExpiresIn: 60 * 60 * 1000,
   },

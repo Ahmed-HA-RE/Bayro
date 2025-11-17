@@ -19,7 +19,6 @@ import { useState } from 'react';
 import ScreenSpinner from '../ScreenSpinner';
 import { useRouter } from 'next/navigation';
 import { registerUser } from '@/app/actions/auth';
-import { sendEmailVerificationOTP } from '@/app/actions/auth';
 
 const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
   const [isPending, setIsPending] = useState(false);
