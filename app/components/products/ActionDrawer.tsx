@@ -48,6 +48,7 @@ const ActionDrawer = ({ product }: { product: Product }) => {
         position: 'top-left',
         classNames: {
           toast: '!w-[468px]',
+          actionButton: '!font-bold !text-sm !py-4 !px-4',
         },
       });
     } catch (error: any) {

@@ -11,6 +11,7 @@ import {
 import { APIError } from 'better-auth';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 export const registerUser = async (values: RegisterUserForm) => {
   try {
@@ -37,7 +38,7 @@ export const registerUser = async (values: RegisterUserForm) => {
     };
   } catch (error) {
     if (error instanceof APIError) {
-      throw new Error(error.body?.message);
+      return { success: false, message: error.message };
     }
   }
 };
@@ -75,6 +76,10 @@ export const signOutUser = async () => {
   const result = await auth.api.signOut({
     headers: await headers(),
   });
+
+  // reset the sessionCartId cookie
+
+  (await cookies()).delete('sessionCartId');
 
   return result;
 };

@@ -19,7 +19,6 @@ import { useState } from 'react';
 import ScreenSpinner from '../ScreenSpinner';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { registerUser } from '@/app/actions/auth';
-import { APIError } from 'better-auth';
 
 const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
   const [isPending, setIsPending] = useState(false);
@@ -38,15 +37,17 @@ const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
   });
 
   const onSubmit = async (values: RegisterUserForm) => {
-    try {
-      setIsPending(true);
-      const result = await registerUser(values);
+    setIsPending(true);
+    const result = await registerUser(values);
+
+    if (result && !result.success) {
+      destructiveToast(result.message);
+      setIsPending(false);
+      return;
+    } else {
+      setIsPending(false);
       successToast(result?.message);
       setTimeout(() => router.push(callbackUrl), 1500);
-    } catch (error: any) {
-      destructiveToast(error.message);
-    } finally {
-      setIsPending(false);
     }
   };
 

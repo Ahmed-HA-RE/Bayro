@@ -13,7 +13,7 @@ const ProductCard = ({ product }: { product: Product }) => {
   return (
     <div className='flex *:rounded-none *:shadow-none max-xl:flex-col max-xl:*:not-last:border-b-0 max-xl:*:first:rounded-t-xl max-xl:*:last:rounded-b-xl xl:*:not-last:border-r-0 xl:*:first:rounded-l-xl xl:*:last:rounded-r-xl'>
       <Card className='overflow-hidden pt-0 gap-4 border-gray-300 dark:dark-border-color w-full'>
-        <Link href={`/products/${product.slug}`}>
+        <Link href={`/product/${product.slug}`}>
           <CardContent className='px-0 h-60 flex items-stretch sm:h-70 overflow-hidden '>
             <Image
               src={product.images[0]}
