@@ -12,6 +12,7 @@ import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
 import Link from 'next/link';
 import { auth } from '@/lib/auth';
+import { SERVER_URL } from '@/lib/constants';
 
 type CartTotalCardProps = {
   cart: Cart;
@@ -63,8 +64,8 @@ const CartTotalCard = ({ cart, session }: CartTotalCardProps) => {
           <Link
             href={
               !session
-                ? '/signin?callbackUrl=/shipping-address'
-                : '/shipping-address'
+                ? `/signin?callbackUrl=${SERVER_URL}/checkout/shipping-address`
+                : '/checkout/shipping-address'
             }
           >
             Proceed to Checkout

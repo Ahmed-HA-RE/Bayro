@@ -68,6 +68,7 @@ export const addItemToCart = async (item: CartItem) => {
       await prisma.cart.create({
         data: newCart.data,
       });
+      revalidatePath(`/product/${product.slug}`);
     }
 
     return { success: true, message: `${item.name} added to cart` };

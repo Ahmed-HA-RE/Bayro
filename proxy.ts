@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { auth } from './lib/auth';
 import { headers } from 'next/headers';
+import { SERVER_URL } from './lib/constants';
 
 export const proxy = async (req: NextRequest) => {
   const session = await auth.api.getSession({
@@ -11,36 +12,37 @@ export const proxy = async (req: NextRequest) => {
     .get('error')
     ?.includes('INVALID_TOKEN');
 
-  if (
-    session &&
-    session.user.role !== 'admin' &&
-    req.nextUrl.pathname === '/register'
-  ) {
+  const { pathname } = req.nextUrl;
+
+  if (session && session.user.role !== 'admin' && pathname === '/register') {
     return NextResponse.redirect(new URL('/', req.url));
   } else if (
     session &&
     session.user.role !== 'admin' &&
-    req.nextUrl.pathname === '/signin'
+    pathname === '/signin'
   ) {
     return NextResponse.redirect(new URL('/', req.url));
   } else if (
     (!session || session.user.emailVerified) &&
-    req.nextUrl.pathname === '/verify-email'
+    pathname === '/verify-email'
   ) {
     return NextResponse.redirect(new URL('/', req.url));
   } else if (
     session &&
     session.user.role !== 'admin' &&
-    req.nextUrl.pathname === '/forgot-password'
+    pathname === '/forgot-password'
   ) {
     return NextResponse.redirect(new URL('/', req.url));
-  } else if (invalidToken && req.nextUrl.pathname === '/reset-password') {
+  } else if (invalidToken && pathname === '/reset-password') {
     return NextResponse.redirect(
       new URL('/verification?status=false', req.url)
     );
-  } else if (!session && req.nextUrl.pathname === '/shipping-address') {
+  } else if (!session && pathname === '/checkout/shipping-address') {
     return NextResponse.redirect(
-      new URL('/signin?callbackUrl=/shipping-address', req.url)
+      new URL(
+        `/signin?callbackUrl=${SERVER_URL}/checkout/shipping-address`,
+        req.url
+      )
     );
   }
 
@@ -63,7 +65,7 @@ export const config = {
     '/verify-email',
     '/forgot-password',
     '/reset-password',
-    '/shipping-address',
+    '/checkout/shipping-address',
     '/((?!api|_next/static|_next/image|.*\\.png$).*)',
   ],
 };

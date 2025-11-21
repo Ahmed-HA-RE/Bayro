@@ -44,7 +44,7 @@ const ShippingAddressForm = ({ userAddress }: { userAddress: Shipping }) => {
         const res = await updateUserAddress(data);
 
         if (res?.success) {
-          router.push('/payment-method');
+          router.push('/checkout/payment-method');
         }
       } catch (error: any) {
         destructiveToast(error.message);

@@ -35,7 +35,6 @@ type ActionDrawerProps = {
 const ActionDrawer = ({ product, cart }: ActionDrawerProps) => {
   const isMobile = useIsMatchMedia('(max-width: 768px)');
   const [openDrawer, setOpenDrawer] = useState(false);
-  // const [isPending, setIsPending] = useState(false);
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
