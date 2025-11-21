@@ -17,13 +17,15 @@ import {
 } from './ui/field';
 import { Input } from './ui/input';
 import { NativeSelect, NativeSelectOption } from './ui/native-select';
-import { UAECITIES } from '@/lib/utils';
+import { destructiveToast, UAECITIES } from '@/lib/utils';
 import { PhoneInput } from './ui/phone-number-input';
 import { Button } from './ui/button';
 import { ArrowRight } from 'lucide-react';
+import { updateUserAddress } from '../actions/auth';
 
 const ShippingAddressForm = ({ userAddress }: { userAddress: Shipping }) => {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const form = useForm<Shipping>({
     resolver: zodResolver(shippingSchema),
@@ -37,11 +39,22 @@ const ShippingAddressForm = ({ userAddress }: { userAddress: Shipping }) => {
   });
 
   const onSubmit = async (data: Shipping) => {
-    console.log(data);
+    startTransition(async () => {
+      try {
+        const res = await updateUserAddress(data);
+
+        if (res?.success) {
+          router.push('/payment-method');
+        }
+      } catch (error: any) {
+        destructiveToast(error.message);
+      }
+    });
   };
 
   return (
     <form className='mt-4' onSubmit={form.handleSubmit(onSubmit)}>
+      {isPending && <ScreenSpinner mutate={true} />}
       <FieldSet>
         <FieldGroup className=''>
           {/* Full Name */}
@@ -149,8 +162,8 @@ const ShippingAddressForm = ({ userAddress }: { userAddress: Shipping }) => {
             className='self-start text-base h-10'
             type='submit'
           >
-            <ArrowRight />
             Continue
+            <ArrowRight />
           </Button>
         </FieldGroup>
       </FieldSet>

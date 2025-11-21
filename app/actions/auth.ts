@@ -13,6 +13,8 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
+import { Shipping } from '@/types';
+import { shippingSchema } from '@/schema/shippingSchema';
 
 export const registerUser = async (values: RegisterUserForm) => {
   try {
@@ -174,6 +176,28 @@ export const getUserById = async (userId: string) => {
       throw new Error('User not found');
     }
     return user;
+  } catch (error) {
+    throw new Error((error as Error).message);
+  }
+};
+
+export const updateUserAddress = async (data: Shipping) => {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) throw new Error('User not found');
+
+    const validatedAddress = shippingSchema.safeParse(data);
+
+    if (validatedAddress.success) {
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { address: validatedAddress.data },
+      });
+      return { success: true, message: 'Address updated successfully' };
+    }
   } catch (error) {
     throw new Error((error as Error).message);
   }
