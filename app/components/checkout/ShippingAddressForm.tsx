@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import ScreenSpinner from '../ScreenSpinner';
 import { shippingSchema } from '@/schema/checkoutSchema';
 import { useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Shipping } from '@/types';
 import {
   Field,
@@ -22,10 +22,13 @@ import { PhoneInput } from '../ui/phone-number-input';
 import { Button } from '../ui/button';
 import { ArrowRight } from 'lucide-react';
 import { updateUserAddress } from '../../actions/auth';
+import { usePathname } from 'next/navigation';
 
 const ShippingAddressForm = ({ userAddress }: { userAddress: Shipping }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const callbackUrl =
+    useSearchParams().get('callbackUrl') || '/checkout/payment-method';
 
   const form = useForm<Shipping>({
     resolver: zodResolver(shippingSchema),
@@ -45,7 +48,7 @@ const ShippingAddressForm = ({ userAddress }: { userAddress: Shipping }) => {
 
         if (res.success) {
           successToast(res.message);
-          router.push('/checkout/payment-method');
+          router.push(callbackUrl);
         }
       } catch (error: any) {
         destructiveToast(error.message);

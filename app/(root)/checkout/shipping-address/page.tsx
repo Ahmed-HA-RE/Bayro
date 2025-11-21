@@ -29,7 +29,7 @@ const ShippingAddressPage = async () => {
   return (
     <>
       <CheckoutStepper currentStep={1} />
-      <section className='mt-4'>
+      <section>
         <div className='max-w-md mx-auto'>
           <h1 className='text-3xl font-bold mb-3'>Shipping Address</h1>
           <p className='text-sm text-gray-400 dark:text-gray-400 text-left max-w-md mb-6'>

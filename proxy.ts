@@ -44,6 +44,17 @@ export const proxy = async (req: NextRequest) => {
         req.url
       )
     );
+  } else if (!session && pathname === '/checkout/payment-method') {
+    return NextResponse.redirect(
+      new URL(
+        `/signin?callbackUrl=${SERVER_URL}/checkout/payment-method`,
+        req.url
+      )
+    );
+  } else if (!session && pathname === '/checkout/place-order') {
+    return NextResponse.redirect(
+      new URL(`/signin?callbackUrl=${SERVER_URL}/checkout/place-order`, req.url)
+    );
   }
 
   // Storing cartId in cookies
@@ -66,6 +77,8 @@ export const config = {
     '/forgot-password',
     '/reset-password',
     '/checkout/shipping-address',
+    '/checkout/payment-method',
+    '/checkout/place-order',
     '/((?!api|_next/static|_next/image|.*\\.png$).*)',
   ],
 };

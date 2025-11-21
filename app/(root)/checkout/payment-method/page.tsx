@@ -26,11 +26,12 @@ const PaymentMethodPage = async () => {
   const cart = await getMyCart();
 
   if (!cart || cart.items.length === 0) redirect('/cart');
+  if (!user.address) redirect('/checkout/shipping-address');
 
   return (
     <>
       <CheckoutStepper currentStep={2} />
-      <section className='mt-4'>
+      <section>
         <div className='max-w-md mx-auto'>
           <h1 className='text-3xl font-bold mb-3'>Payment Method</h1>
           <p className='text-sm text-gray-400 dark:text-gray-400 text-left max-w-md mb-6'>

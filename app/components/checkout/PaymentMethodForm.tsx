@@ -7,14 +7,7 @@ import { paymentMethodSchema } from '@/schema/checkoutSchema';
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { PaymentMethod } from '@/types';
-import {
-  Field,
-  FieldContent,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldSet,
-} from '../ui/field';
+import { Field, FieldError, FieldLabel, FieldSet } from '../ui/field';
 import { destructiveToast, successToast } from '@/lib/utils';
 import { PAYMENT_METHODS } from '@/lib/constants';
 import { Button } from '../ui/button';

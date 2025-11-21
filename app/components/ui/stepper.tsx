@@ -88,7 +88,7 @@ function Stepper({
       <div
         data-slot='stepper'
         className={cn(
-          'group/stepper inline-flex data-[orientation=horizontal]:w-full data-[orientation=horizontal]:flex-row data-[orientation=vertical]:flex-col',
+          'group/stepper flex data-[orientation=horizontal]:w-full data-[orientation=horizontal]:flex-row data-[orientation=vertical]:flex-col',
           className
         )}
         data-orientation={orientation}
@@ -133,7 +133,7 @@ function StepperItem({
       <div
         data-slot='stepper-item'
         className={cn(
-          'group/step flex items-center group-data-[orientation=horizontal]/stepper:flex-row group-data-[orientation=vertical]/stepper:flex-col ',
+          'group/step flex  items-center group-data-[orientation=horizontal]/stepper:flex-row group-data-[orientation=vertical]/stepper:flex-col ',
           className
         )}
         data-state={state}

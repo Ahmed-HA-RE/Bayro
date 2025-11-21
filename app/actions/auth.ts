@@ -175,7 +175,7 @@ export const getUserById = async (userId: string) => {
     if (!user) {
       throw new Error('User not found');
     }
-    return user;
+    return { ...user, address: user.address as Shipping | null };
   } catch (error) {
     throw new Error((error as Error).message);
   }
