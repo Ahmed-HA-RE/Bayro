@@ -164,7 +164,7 @@ export const singInSocials = async (
   }
 };
 
-export const getUserById = async (userId: string | undefined) => {
+export const getUserById = async (userId: string) => {
   try {
     const user = await prisma.user.findFirst({
       where: { id: userId },

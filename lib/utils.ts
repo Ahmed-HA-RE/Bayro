@@ -59,3 +59,14 @@ export const moneyAmountString = () => {
 export const roundToTwoDecimals = (num: number) => {
   return Math.round((num + Number.EPSILON) * 100) / 100;
 };
+
+// Cities list for select input
+export const UAECITIES = [
+  { value: 'Abu Dhabi', label: 'Abu Dhabi' },
+  { value: 'Dubai', label: 'Dubai' },
+  { value: 'Sharjah', label: 'Sharjah' },
+  { value: 'Ajman', label: 'Ajman' },
+  { value: 'Umm Al Quwain', label: 'Umm Al Quwain' },
+  { value: 'Ras Al Khaimah', label: 'Ras Al Khaimah' },
+  { value: 'Fujairah', label: 'Fujairah' },
+];
