@@ -36,3 +36,10 @@ export const paymentMethodSchema = z.object({
     error: 'Payment Method is required',
   }),
 });
+
+export const paymentResultsSchema = z.object({
+  id: z.string(),
+  status: z.string(),
+  email_address: z.email(),
+  pricePaid: z.string(),
+});

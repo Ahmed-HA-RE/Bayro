@@ -20,6 +20,7 @@ import { Separator } from '@/app/components/ui/separator';
 import { Order } from '@/types';
 import { formatDateTime, formatId } from '@/lib/utils';
 import { Badge } from './ui/badge';
+import { createOrderPayment } from '../actions/order';
 
 const OrderDetailsTable = ({ order }: { order: Order }) => {
   return (

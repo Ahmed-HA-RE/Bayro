@@ -7,8 +7,9 @@ import { orderSchema } from '@/schema/orderSchema';
 import { headers } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { convertToPlainObject } from '@/lib/utils';
-import { Shipping } from '@/types';
+import { PaymentResults, Shipping } from '@/types';
 import { paypal } from '@/lib/paypal';
+import { revalidatePath } from 'next/cache';
 
 export const createOrder = async () => {
   try {
@@ -106,7 +107,75 @@ export const createOrderPayment = async (orderId: string) => {
 
     const paypalOrder = await paypal.createOrder(Number(order.totalPrice));
 
+    await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        paymentResult: {
+          id: paypalOrder.id,
+          status: paypalOrder.status,
+          email_address: '',
+          pricePaid: 0,
+        },
+      },
+    });
+
     return paypalOrder;
+  } catch (error) {
+    throw new Error((error as Error).message);
+  }
+};
+
+export const confirmOrderPayment = async (
+  orderId: string,
+  paymentResult: PaymentResults
+) => {
+  try {
+    const order = await prisma.order.findFirst({
+      where: { id: orderId },
+      include: { orderItems: true },
+    });
+
+    if (!order) throw new Error('No Order Found');
+
+    const capturePayPalPayment = await paypal.capturePayment(paymentResult.id);
+
+    if (!capturePayPalPayment || capturePayPalPayment.status !== 'COMPLETED') {
+      throw new Error('Something went wrong with the payment process');
+    }
+
+    // Do Transaction to update the order and product stock
+    await prisma.$transaction(async (tx) => {
+      await tx.order.update({
+        where: { id: orderId },
+        data: {
+          paymentResult: {
+            id: capturePayPalPayment.id,
+            status: capturePayPalPayment.status,
+            email_address: capturePayPalPayment.payer?.email_address,
+            pricePaid:
+              capturePayPalPayment.purchase_units[0].payments?.captures[0]
+                ?.amount?.value,
+          },
+          isPaid: true,
+          paidAt: new Date(),
+        },
+      });
+
+      for (const item of order.orderItems) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: { decrement: item.qty },
+          },
+        });
+      }
+    });
+
+    revalidatePath(`/order/${orderId}`, 'page');
+    return {
+      success: true,
+      message: 'Payment completed successfully. Thank you for your purchase!',
+    };
   } catch (error) {
     throw new Error((error as Error).message);
   }

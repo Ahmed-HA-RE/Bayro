@@ -1,7 +1,11 @@
 import z from 'zod';
 import { insertProductSchema } from '@/schema/productSchema';
 import { cartItemSchema, cartSchema } from '@/schema/cartSchema';
-import { paymentMethodSchema, shippingSchema } from '@/schema/checkoutSchema';
+import {
+  paymentMethodSchema,
+  paymentResultsSchema,
+  shippingSchema,
+} from '@/schema/checkoutSchema';
 import { orderItemSchema, orderSchema } from '@/schema/orderSchema';
 
 export type Product = z.infer<typeof insertProductSchema> & {
@@ -24,3 +28,5 @@ export type Order = z.infer<typeof orderSchema> & {
   user: { name: string; email: string };
   orderItems: OrderItems[];
 };
+
+export type PaymentResults = z.infer<typeof paymentResultsSchema>;
