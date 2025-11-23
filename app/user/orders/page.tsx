@@ -12,6 +12,7 @@ import {
 } from '@/app/components/ui/table';
 import { convertToNumber, formatDateTime, formatId } from '@/lib/utils';
 import { Button } from '@/app/components/ui/button';
+import PaginationControls from '@/app/components/Pagination';
 
 const UserOrdersPage = async ({
   searchParams,
@@ -41,62 +42,70 @@ const UserOrdersPage = async ({
           </AlertDescription>
         </Alert>
       ) : (
-        <Table className=''>
-          <TableHeader>
-            <TableRow className='hover:bg-transparent'>
-              <TableHead className='px-4'>ID</TableHead>
-              <TableHead className='px-4'>DATE</TableHead>
-              <TableHead className='px-4'>TOTAL</TableHead>
-              <TableHead className='px-4'>PAID</TableHead>
-              <TableHead className='px-4'>DELIVERED</TableHead>
-              <TableHead className='px-4'>Balance</TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {orders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className='px-4 font-medium'>
-                  {formatId(order.id)}
-                </TableCell>
-                <TableCell className='px-4'>
-                  {formatDateTime(order.createdAt).dateTime}
-                </TableCell>
-                <TableCell className='px-4'>
-                  <div className='flex gap-0.5 dark:text-orange-400'>
-                    <p className='dirham-symbol'>&#xea;</p>
-                    <p>{convertToNumber(order.totalPrice)}</p>
-                  </div>
-                </TableCell>
-                <TableCell className='px-4'>
-                  {order.paidAt && order.isPaid ? (
-                    formatDateTime(order.paidAt).dateTime
-                  ) : (
-                    <span className='flex items-center gap-1'>
-                      <X className='text-red-500' />
-                      Not Paid
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell className='px-4'>
-                  {order.deliveredAt && order.isDelivered ? (
-                    formatDateTime(order.deliveredAt).dateOnly
-                  ) : (
-                    <span className='flex items-center gap-1'>
-                      <X className='text-red-500' />
-                      Not Delivered
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell className='px-4'>
-                  <Button size='sm' asChild>
-                    <Link href={`/order/${order.id}`}>Details</Link>
-                  </Button>
-                </TableCell>
+        <>
+          <Table>
+            <TableHeader>
+              <TableRow className='hover:bg-transparent'>
+                <TableHead className='px-4'>ID</TableHead>
+                <TableHead className='px-4'>DATE</TableHead>
+                <TableHead className='px-4'>TOTAL</TableHead>
+                <TableHead className='px-4'>PAID</TableHead>
+                <TableHead className='px-4'>DELIVERED</TableHead>
+                <TableHead className='px-4 text-right'>ACTIONS</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+
+            <TableBody>
+              {orders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell className='px-4 font-medium'>
+                    {formatId(order.id)}
+                  </TableCell>
+                  <TableCell className='px-4'>
+                    {formatDateTime(order.createdAt).dateTime}
+                  </TableCell>
+                  <TableCell className='px-4'>
+                    <div className='flex gap-0.5 dark:text-orange-400'>
+                      <p className='dirham-symbol'>&#xea;</p>
+                      <p>{convertToNumber(order.totalPrice)}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell className='px-4'>
+                    {order.paidAt && order.isPaid ? (
+                      formatDateTime(order.paidAt).dateTime
+                    ) : (
+                      <span className='flex items-center gap-1'>
+                        <X className='text-red-500' />
+                        Not Paid
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell className='px-4'>
+                    {order.deliveredAt && order.isDelivered ? (
+                      formatDateTime(order.deliveredAt).dateOnly
+                    ) : (
+                      <span className='flex items-center gap-1'>
+                        <X className='text-red-500' />
+                        Not Delivered
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell className='px-4 text-right'>
+                    <Button size='sm' asChild>
+                      <Link href={`/order/${order.id}`}>Details</Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          {result.totalPages! > 1 && orders.length > 0 && (
+            <PaginationControls
+              currentPage={page}
+              totalPages={result.totalPages as number}
+            />
+          )}
+        </>
       )}
     </section>
   );

@@ -184,7 +184,7 @@ export const confirmOrderPayment = async (
   }
 };
 
-export const getMyOrders = async (page: number, limit: number = 2) => {
+export const getMyOrders = async (page: number, limit: number = 10) => {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
