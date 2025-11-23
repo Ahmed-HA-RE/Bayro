@@ -55,6 +55,10 @@ export const proxy = async (req: NextRequest) => {
     return NextResponse.redirect(
       new URL(`/signin?callbackUrl=${SERVER_URL}/checkout/place-order`, req.url)
     );
+  } else if (!session && pathname === '/user/orders') {
+    return NextResponse.redirect(new URL(`/`, req.url));
+  } else if (!session && pathname === '/user/profile') {
+    return NextResponse.redirect(new URL(`/`, req.url));
   }
 
   // Storing cartId in cookies
@@ -81,6 +85,8 @@ export const config = {
     '/checkout/shipping-address',
     '/checkout/payment-method',
     '/checkout/place-order',
+    '/user/profile',
+    '/user/orders',
     '/((?!api|_next/static|_next/image|.*\\.png$).*)',
   ],
 };

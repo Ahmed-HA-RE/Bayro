@@ -2,6 +2,9 @@ import { getOrderById } from '@/app/actions/order';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import OrderDetailsTable from '@/app/components/OrderDetailsTable';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Order Details',
@@ -14,9 +17,14 @@ const OrderDetailsPage = async ({
   params: Promise<{ id: string }>;
 }) => {
   const { id } = await params;
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   const order = await getOrderById(id);
   if (!order) notFound();
+
+  if (session?.user.id !== order.userId) redirect('/');
 
   return (
     <OrderDetailsTable

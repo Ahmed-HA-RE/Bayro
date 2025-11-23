@@ -22,12 +22,15 @@ import { Suspense, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import ScreenSpinner from '../ScreenSpinner';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const UserMenu = ({
   session,
 }: {
   session: typeof auth.$Infer.Session | null;
 }) => {
+  const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const adminLinks =
@@ -43,13 +46,13 @@ const UserMenu = ({
 
   const baseLinks = [
     {
-      href: '/profile',
+      href: '/user/profile',
       label: 'Profile',
       icon: <FaUserLarge size={16} aria-hidden='true' />,
     },
     {
-      href: '/order-history',
-      label: 'Order history',
+      href: '/user/orders',
+      label: 'Orders History',
       icon: <TfiPackage size={16} aria-hidden='true' />,
     },
   ];
@@ -107,10 +110,17 @@ const UserMenu = ({
               </span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+            <DropdownMenuGroup className='space-y-1'>
               {userMenuLinks.map((link, index) => (
-                <DropdownMenuItem asChild key={index}>
-                  <Link className='dark:hover:text-black' href={link.href}>
+                <DropdownMenuItem className='' asChild key={index}>
+                  <Link
+                    className={cn(
+                      'dark:hover:text-black',
+
+                      pathname === link.href && 'bg-gray-200 dark:text-black'
+                    )}
+                    href={link.href}
+                  >
                     {link.icon}
                     {link.label}
                   </Link>
