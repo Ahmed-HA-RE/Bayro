@@ -21,7 +21,7 @@ import {
 } from '@react-email/components';
 import { APP_NAME } from '@/lib/constants';
 
-interface VeloriaEmailVerificationProps {
+interface BayroEmailVerificationProps {
   otp: string;
 }
 
@@ -30,9 +30,9 @@ const baseUrl =
     ? `${process.env.NEXT_PUBLIC_PROD_URL}/images`
     : '/static';
 
-export const VeloriaEmailVerification = ({
+export const BayroEmailVerification = ({
   otp,
-}: VeloriaEmailVerificationProps) => (
+}: BayroEmailVerificationProps) => (
   <Tailwind
     config={{
       presets: [pixelBasedPreset],
@@ -51,7 +51,7 @@ export const VeloriaEmailVerification = ({
           fontStyle='normal'
         />
       </Head>
-      <Body className='bg-white font-veloria mx-auto my-0'>
+      <Body className='bg-white mx-auto my-0'>
         <Preview>Confirm your email address</Preview>
         <Container className='mx-auto my-0 py-0 px-5'>
           <Section className='mt-8'>
@@ -157,4 +157,4 @@ export const VeloriaEmailVerification = ({
   </Tailwind>
 );
 
-export default VeloriaEmailVerification;
+export default BayroEmailVerification;

@@ -18,7 +18,7 @@ import {
 } from '@react-email/components';
 import { APP_NAME } from '@/lib/constants';
 
-interface VeloriaResetPasswordProps {
+interface BayroResetPasswordProps {
   userName: string;
   resetPasswordLink: string;
 }
@@ -28,10 +28,10 @@ const baseUrl =
     ? `${process.env.NEXT_PUBLIC_PROD_URL}/images`
     : '/static';
 
-const VeloriaResetPassword = ({
+const BayroResetPassword = ({
   userName,
   resetPasswordLink,
-}: VeloriaResetPasswordProps) => {
+}: BayroResetPasswordProps) => {
   return (
     <Tailwind
       config={{
@@ -94,4 +94,4 @@ const VeloriaResetPassword = ({
   );
 };
 
-export default VeloriaResetPassword;
+export default BayroResetPassword;

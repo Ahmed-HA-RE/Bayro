@@ -20,10 +20,10 @@ const calcPrices = (items: CartItem[]) => {
   const totalPrice = roundToTwoDecimals(itemsPrice + shippingPrice + taxPrice);
 
   return {
-    itemsPrice,
-    shippingPrice,
-    taxPrice,
-    totalPrice,
+    itemsPrice: itemsPrice.toFixed(2),
+    shippingPrice: shippingPrice.toFixed(2),
+    taxPrice: taxPrice.toFixed(2),
+    totalPrice: totalPrice.toFixed(2),
   };
 };
 
@@ -64,6 +64,7 @@ export const addItemToCart = async (item: CartItem) => {
       taxPrice,
       totalPrice,
     });
+    console.log(newCart);
     if (newCart.success) {
       await prisma.cart.create({
         data: newCart.data,
@@ -106,7 +107,7 @@ export const addItemToCart = async (item: CartItem) => {
         id: cart.id,
       },
     });
-    revalidatePath(`/product/${product.slug}`);
+    revalidatePath(`/product/${product.slug}`, 'page');
     return {
       success: true,
       message: existingItem

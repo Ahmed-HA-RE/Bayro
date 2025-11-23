@@ -4,8 +4,8 @@ import prisma from './prisma';
 import { nextCookies } from 'better-auth/next-js';
 import { emailOTP } from 'better-auth/plugins/email-otp';
 import { Resend } from 'resend';
-import VeloriaEmailVerification from '@/emails/VerifyEmail';
-import VeloriaResetPassword from '@/emails/ResetPassword';
+import BayroEmailVerification from '@/emails/VerifyEmail';
+import BayroResetPassword from '@/emails/ResetPassword';
 import { APP_NAME } from '@/lib/constants';
 import { createAuthMiddleware } from 'better-auth/api';
 
@@ -47,7 +47,7 @@ export const auth = betterAuth({
         replyTo: process.env.REPLY_TO_GMAIL,
         to: user.email,
         subject: 'Reset Password',
-        react: VeloriaResetPassword({
+        react: BayroResetPassword({
           userName: user.name,
           resetPasswordLink: url,
         }),
@@ -81,7 +81,7 @@ export const auth = betterAuth({
             replyTo: process.env.REPLY_TO_GMAIL,
             to: email,
             subject: 'Email Verification',
-            react: VeloriaEmailVerification({ otp }),
+            react: BayroEmailVerification({ otp }),
           });
           console.log(error);
         }

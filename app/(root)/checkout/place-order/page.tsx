@@ -26,6 +26,8 @@ import {
 import Image from 'next/image';
 import { Separator } from '@/app/components/ui/separator';
 import PlaceOrderBtn from '@/app/components/checkout/PlaceOrderBtn';
+import { Alert, AlertDescription, AlertTitle } from '@/app/components/ui/alert';
+import { CircleAlertIcon, XIcon } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Place Order',
@@ -208,10 +210,24 @@ const PlaceOrderPage = async () => {
                 </div>
               </CardContent>
               {/* Place Order Button */}
-              <CardFooter className='px-4'>
-                <PlaceOrderBtn />
-              </CardFooter>
+              {user.emailVerified && (
+                <CardFooter className='px-4'>
+                  <PlaceOrderBtn />
+                </CardFooter>
+              )}
             </Card>
+            {!user.emailVerified && (
+              <Alert className='border-none bg-sky-600 text-white dark:bg-sky-400 mt-6'>
+                <CircleAlertIcon />
+                <AlertTitle>Verify your email to place the order</AlertTitle>
+                <AlertDescription className='text-white/80 text-xs'>
+                  To complete your order, please verify your email. We've sent a
+                  confirmation link to your inbox, click it to confirm your
+                  email and proceed with your purchase. If the link has expired,
+                  check the banner above to resend a new one.
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
         </div>
       </section>

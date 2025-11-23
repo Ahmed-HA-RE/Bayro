@@ -64,6 +64,8 @@ export const proxy = async (req: NextRequest) => {
     const res = NextResponse.next();
     res.cookies.set('sessionCartId', sessionCartId, {
       maxAge: 60 * 60 * 24 * 30, // 30 days
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
     });
 
     return res;
