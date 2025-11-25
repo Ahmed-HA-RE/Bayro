@@ -27,12 +27,6 @@ export const proxy = async (req: NextRequest) => {
     pathname === '/verify-email'
   ) {
     return NextResponse.redirect(new URL('/', req.url));
-  } else if (
-    session &&
-    session.user.role !== 'admin' &&
-    pathname === '/forgot-password'
-  ) {
-    return NextResponse.redirect(new URL('/', req.url));
   } else if (invalidToken && pathname === '/reset-password') {
     return NextResponse.redirect(
       new URL('/verification?status=false', req.url)
@@ -80,7 +74,6 @@ export const config = {
     '/register',
     '/signin',
     '/verify-email',
-    '/forgot-password',
     '/reset-password',
     '/checkout/shipping-address',
     '/checkout/payment-method',

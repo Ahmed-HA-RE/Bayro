@@ -5,8 +5,10 @@ import { SERVER_URL } from '@/lib/constants';
 import {
   type RegisterUserForm,
   SignInUserForm,
+  UpdateUserPassForm,
   registerSchema,
   signInSchema,
+  updateUserPassSchema,
   updateUserPubInfoSchema,
 } from '@/schema/userSchema';
 import { APIError } from 'better-auth';
@@ -332,6 +334,55 @@ export const updateuserContactInfo = async (data: Shipping) => {
       success: true,
       message: 'Contact information updated successfully',
     };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+};
+
+export const updateUserPass = async (values: UpdateUserPassForm) => {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) throw new Error('Unauthorized');
+
+    const accounts = await auth.api.listUserAccounts({
+      headers: await headers(),
+    });
+
+    const loggedInWithCredential = accounts.filter(
+      (account) => account.providerId === 'credential'
+    );
+
+    if (loggedInWithCredential.length === 0) {
+      return {
+        success: false,
+        message: 'Cannot change password for OAuth accounts',
+      };
+    }
+
+    const user = await prisma.user.findFirst({
+      where: { id: session?.user.id },
+    });
+
+    if (!user) throw new Error('User not found');
+
+    const validateData = updateUserPassSchema.safeParse(values);
+
+    if (!validateData.success) {
+      return { success: false, message: 'Some fields are invalid' };
+    }
+
+    await auth.api.changePassword({
+      body: {
+        currentPassword: validateData.data.currentPassword,
+        newPassword: validateData.data.newPassword,
+      },
+      headers: await headers(),
+    });
+
+    return { success: true, message: 'Password updated successfully' };
   } catch (error) {
     return { success: false, message: (error as Error).message };
   }

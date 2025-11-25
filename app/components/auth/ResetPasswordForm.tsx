@@ -74,51 +74,48 @@ const ResetPasswordForm = ({
                     to update your account security.
                   </p>
                 </div>
-
-                <Field>
-                  {/* Password */}
-                  <Controller
-                    control={form.control}
-                    name='password'
-                    render={({ field, fieldState }) => (
-                      <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor='password'>Password</FieldLabel>
-                        <Input
-                          id='password'
-                          type='password'
-                          aria-invalid={fieldState.invalid}
-                          className='auth-input'
-                          {...field}
-                        />
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    )}
-                  />
-                  {/* Confirm Password */}
-                  <Controller
-                    control={form.control}
-                    name='confirmPassword'
-                    render={({ field, fieldState }) => (
-                      <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor='confrim_password'>
-                          Confirm Password
-                        </FieldLabel>
-                        <Input
-                          id='confrim_password'
-                          type='password'
-                          aria-invalid={fieldState.invalid}
-                          className='auth-input'
-                          {...field}
-                        />
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    )}
-                  />
-                </Field>
+                {/* Password */}
+                <Controller
+                  control={form.control}
+                  name='password'
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor='password'>Password</FieldLabel>
+                      <Input
+                        id='password'
+                        type='password'
+                        aria-invalid={fieldState.invalid}
+                        className='auth-input'
+                        {...field}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+                {/* Confirm Password */}
+                <Controller
+                  control={form.control}
+                  name='confirmPassword'
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor='confrim_password'>
+                        Confirm Password
+                      </FieldLabel>
+                      <Input
+                        id='confrim_password'
+                        type='password'
+                        aria-invalid={fieldState.invalid}
+                        className='auth-input'
+                        {...field}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
                 <Field>
                   <Button disabled={isPending} type='submit'>
                     Create Account

@@ -66,3 +66,16 @@ export const updateUserPubInfoSchema = z.object({
     .optional()
     .nullable(),
 });
+
+export const updateUserPassSchema = z
+  .object({
+    currentPassword: resetPassSchema.shape.password,
+    newPassword: resetPassSchema.shape.password,
+    confirmPassword: resetPassSchema.shape.confirmPassword,
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    error: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
+export type UpdateUserPassForm = z.infer<typeof updateUserPassSchema>;
