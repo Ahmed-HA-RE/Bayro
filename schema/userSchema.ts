@@ -58,7 +58,7 @@ export const resetPassSchema = z
 
 export type ResetPassword = z.infer<typeof resetPassSchema>;
 
-export const updateUserContactSchema = z.object({
+export const updateUserPubInfoSchema = z.object({
   name: registerSchema.shape.name,
   bio: z
     .string()
@@ -66,5 +66,3 @@ export const updateUserContactSchema = z.object({
     .optional()
     .nullable(),
 });
-
-export type UpdateUserContact = z.infer<typeof updateUserContactSchema>;

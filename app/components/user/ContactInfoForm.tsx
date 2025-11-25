@@ -1,46 +1,54 @@
 'use client';
 import { useForm, Controller } from 'react-hook-form';
-import { useTransition } from 'react';
-import { updateProfileSchema, UpdateProfile } from '@/schema/userSchema';
+import { useState, useTransition } from 'react';
+import { updateUserPubInfoSchema } from '../../../schema/userSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardFooter } from '../ui/card';
 import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
-import { NativeSelect, NativeSelectOption } from '../ui/native-select';
-import { UAECITIES } from '@/lib/utils';
-import { PhoneInput } from '../ui/phone-number-input';
+import { destructiveToast, successToast } from '@/lib/utils';
 import { Button } from '../ui/button';
-import { auth } from '@/lib/auth';
+import { Spinner } from '../ui/spinner';
+import { Textarea } from '../ui/textarea';
+import AvatarUpload from '../AvatarUpload';
+import { FileMetadata } from '@/app/hooks/use-file-upload';
+import { UpdateUserPubInfo } from '@/types';
+import { updateUserPubInfo } from '@/app/actions/auth';
 
-const ContactInfoForm = ({
-  session,
-}: {
-  session: typeof auth.$Infer.Session;
-}) => {
-  const form = useForm<UpdateProfile>({
-    resolver: zodResolver(updateProfileSchema),
+type UserPublicInfoProps = {
+  userContact: UpdateUserPubInfo;
+};
+
+const UserPublicInfo = ({ userContact }: UserPublicInfoProps) => {
+  const [file, setFile] = useState<File | FileMetadata | undefined>(undefined);
+
+  const form = useForm<UpdateUserPubInfo>({
+    resolver: zodResolver(updateUserPubInfoSchema),
     defaultValues: {
-      name: session.user.name || '',
-      email: session.user.email || '',
-      address: {
-        city: '',
-        phoneNumber: '',
-        streetAddress: '',
-      },
+      name: userContact.name || '',
+      bio: userContact.bio || '',
     },
     mode: 'onSubmit',
   });
 
   const [isPending, startTransition] = useTransition();
 
-  const onSubmit = async (data: UpdateProfile) => {
-    console.log(data);
+  const onSubmit = async (data: UpdateUserPubInfo) => {
+    startTransition(async () => {
+      const result = await updateUserPubInfo(data, file);
+      if (!result.success) {
+        destructiveToast(result.message);
+        return;
+      }
+      successToast(result.message);
+      setTimeout(() => window.location.reload(), 1500);
+    });
   };
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className='flex-1/2 w-full'>
-      <Card className='dark:dark-border-color'>
-        <CardContent>
+      <Card className='dark:dark-border-color gap-6'>
+        <CardContent className='space-y-6'>
           <FieldGroup className='gap-6'>
             {/* Full Name */}
             <Controller
@@ -63,96 +71,26 @@ const ContactInfoForm = ({
                 </Field>
               )}
             />
-            {/* Email */}
+            {/* Bio */}
             <Controller
               control={form.control}
-              name='email'
-              disabled={!session.user.emailVerified}
+              name='bio'
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                  <Input
+                  <div className='flex items-center justify-between gap-1'>
+                    <FieldLabel htmlFor={field.name}>Bio</FieldLabel>
+                    <span className='text-muted-foreground text-xs'>
+                      Optional field
+                    </span>
+                  </div>
+                  <Textarea
+                    placeholder='Public bio for your profile'
+                    className='text-sm auth-input h-32'
                     id={field.name}
-                    type='email'
-                    placeholder='m@example.com'
-                    aria-invalid={fieldState.invalid}
-                    className='auth-input'
-                    {...field}
+                    value={field.value || ''}
+                    onChange={field.onChange}
                   />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            {/* City */}
-            <Controller
-              name='address.city'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>City</FieldLabel>
 
-                  <NativeSelect
-                    aria-invalid={fieldState.invalid}
-                    className='border-black/50 dark:dark-border-color focus-visible:border-blue-500 focus-visible:ring-blue-500 placeholder:text-gray-500 dark:placeholder:text-gray-300'
-                    value={field.value}
-                    onChange={(e) => field.onChange(e)}
-                  >
-                    <NativeSelectOption value=''>
-                      Select City
-                    </NativeSelectOption>
-                    {UAECITIES.map((city) => (
-                      <NativeSelectOption key={city.value} value={city.value}>
-                        {city.label}
-                      </NativeSelectOption>
-                    ))}
-                  </NativeSelect>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            {/* Phone */}
-            <Controller
-              name='address.phoneNumber'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Phone Number</FieldLabel>
-
-                  <PhoneInput
-                    defaultCountry='AE'
-                    countries={['AE']}
-                    countryCallingCodeEditable={false}
-                    limitMaxLength
-                    international
-                    placeholder='Phone Number'
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                    {...field}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            {/* Street Address */}
-            <Controller
-              name='address.streetAddress'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Address</FieldLabel>
-                  <Input
-                    placeholder='Address'
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                    {...field}
-                    className='border-black/50 dark:dark-border-color focus-visible:border-blue-500 focus-visible:ring-blue-500 placeholder:text-gray-500 dark:placeholder:text-gray-300'
-                  />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -160,13 +98,27 @@ const ContactInfoForm = ({
               )}
             />
           </FieldGroup>
+          {/* Avatar */}
+          <div className='space-y-3'>
+            <h2 className='font-medium'>Avatar</h2>
+            <div className='flex flex-row items-center gap-4 '>
+              {/* Upload btn */}
+              <AvatarUpload
+                setFile={setFile}
+                defaultAvatar={userContact.image as string}
+              />
+            </div>
+          </div>
         </CardContent>
-        <CardFooter>
-          <Button>Update</Button>
+        <CardFooter className='self-end'>
+          <Button disabled={isPending}>
+            {isPending && <Spinner className='size-6' />}
+            {isPending ? 'Updating Profile...' : 'Update Profile'}
+          </Button>
         </CardFooter>
       </Card>
     </form>
   );
 };
 
-export default ContactInfoForm;
+export default UserPublicInfo;

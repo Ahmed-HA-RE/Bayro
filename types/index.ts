@@ -7,6 +7,7 @@ import {
   shippingSchema,
 } from '@/schema/checkoutSchema';
 import { orderItemSchema, orderSchema } from '@/schema/orderSchema';
+import { updateUserPubInfoSchema } from '@/schema/userSchema';
 
 export type Product = z.infer<typeof insertProductSchema> & {
   id: string;
@@ -30,3 +31,6 @@ export type Order = z.infer<typeof orderSchema> & {
 };
 
 export type PaymentResults = z.infer<typeof paymentResultsSchema>;
+export type UpdateUserPubInfo = z.infer<typeof updateUserPubInfoSchema> & {
+  image?: string | null;
+};

@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  FileMetadata,
   formatBytes,
   useFileUpload,
   type FileWithPreview,
@@ -9,10 +10,12 @@ import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Button } from '@/app/components/ui/button';
 import { TriangleAlertIcon, User, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 
 interface AvatarUploadProps {
   maxSize?: number;
   className?: string;
+  setFile: Dispatch<SetStateAction<File | FileMetadata | undefined>>;
   onFileChange?: (file: FileWithPreview | null) => void;
   defaultAvatar?: string;
 }
@@ -21,6 +24,7 @@ const AvatarUpload = ({
   maxSize = 1 * 1024 * 1024, // 2MB
   className,
   onFileChange,
+  setFile,
   defaultAvatar,
 }: AvatarUploadProps) => {
   const [
@@ -52,6 +56,12 @@ const AvatarUpload = ({
       removeFile(currentFile.id);
     }
   };
+
+  useEffect(() => {
+    if (files) {
+      setFile(files[0]?.file);
+    }
+  }, [files]);
 
   return (
     <div className='w-full space-y-6'>

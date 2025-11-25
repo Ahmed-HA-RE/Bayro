@@ -7,6 +7,7 @@ import {
   SignInUserForm,
   registerSchema,
   signInSchema,
+  updateUserPubInfoSchema,
 } from '@/schema/userSchema';
 import { APIError } from 'better-auth';
 import { headers } from 'next/headers';
@@ -16,6 +17,10 @@ import prisma from '@/lib/prisma';
 import { Shipping, PaymentMethod } from '@/types';
 import { shippingSchema } from '@/schema/checkoutSchema';
 import { paymentMethodSchema } from '@/schema/checkoutSchema';
+import { revalidatePath } from 'next/cache';
+import { FileMetadata } from '../hooks/use-file-upload';
+import { UpdateUserPubInfo } from '@/types';
+import cloudinary from '../config/cloudinary';
 
 export const registerUser = async (values: RegisterUserForm) => {
   try {
@@ -230,5 +235,72 @@ export const updateUserPayment = async (paymentType: PaymentMethod) => {
     return { success: true, message: 'Payment method updated successfully' };
   } catch (error) {
     throw new Error((error as Error).message);
+  }
+};
+
+export const updateUserPubInfo = async (
+  data: UpdateUserPubInfo,
+  image: File | FileMetadata | undefined
+) => {
+  try {
+    let imageURL = '';
+
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    const user = await prisma.user.findFirst({
+      where: { id: session?.user.id },
+    });
+
+    if (!user) throw new Error('User not found');
+    const validateData = updateUserPubInfoSchema.safeParse({
+      name: data.name || user.name,
+      bio: data.bio || user.bio,
+    });
+
+    if (!validateData.success) {
+      console.log(validateData.error);
+      return { success: false, message: 'Some fields are invalid' };
+    }
+
+    const updateData = {
+      name: validateData.data.name,
+      bio: validateData.data.bio === '' ? null : validateData.data.bio,
+    };
+
+    // convert image to unint8array and upload to file server then get the url
+    if (image instanceof File) {
+      const arrayBuffer = await image.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
+      const result: any = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ folder: 'avatars' }, function (error, result) {
+            if (error) {
+              reject(error);
+              return;
+            }
+            resolve(result);
+          })
+          .end(buffer);
+      });
+
+      imageURL = result.secure_url;
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name: updateData.name,
+        bio: updateData.bio,
+        image: imageURL || user.image,
+      },
+    });
+
+    revalidatePath('/', 'layout');
+
+    return { success: true, message: 'Profile updated successfully' };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
   }
 };

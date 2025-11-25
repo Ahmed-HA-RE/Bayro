@@ -95,6 +95,7 @@ const UserMenu = ({
                     alt='logo'
                     width={50}
                     height={50}
+                    className='object-cover'
                   />
                 </Suspense>
               </Avatar>
