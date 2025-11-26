@@ -309,13 +309,14 @@ export const deleteOrderById = async (id: string) => {
 };
 
 // Update order to be paid for (COD) Admin only
-export const UpdateOrderToPaidCOD = async (id: string) => {
+export const updateOrderToPaidCOD = async (id: string) => {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
     });
 
-    if (!session) throw new Error('User is not authorized');
+    if (!session || session.user.role !== 'admin')
+      throw new Error('User is not authorized');
 
     await prisma.$transaction(async (tx) => {
       const orderId = await tx.order.update({
@@ -354,6 +355,16 @@ export const updateOrderToDelivered = async (id: string) => {
     });
 
     if (!session) throw new Error('User is not authorized');
+
+    const order = await prisma.order.findFirst({
+      where: { id },
+    });
+
+    if (!order) throw new Error('No Order Found');
+
+    if (!order.isPaid) throw new Error('Cannot deliver an unpaid order');
+
+    if (order.isDelivered) throw new Error('Order is already delivered');
 
     await prisma.order.update({
       where: { id },
