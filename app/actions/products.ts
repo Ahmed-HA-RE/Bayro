@@ -35,7 +35,7 @@ export const getAllProducts = async ({
   page,
   query,
   category,
-  limit = 2,
+  limit = 10,
 }: getAllProductsPrams) => {
   try {
     const products = await prisma.product.findMany({
