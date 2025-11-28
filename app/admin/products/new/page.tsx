@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Admin panel to create a new product.',
 };
 
-const CreateProductPage = () => {
+const AdminCreateProductPage = () => {
   return (
     <section className='mt-4'>
       <h1 className='font-bold text-3xl mb-6'>Create Product</h1>
@@ -15,4 +15,4 @@ const CreateProductPage = () => {
   );
 };
 
-export default CreateProductPage;
+export default AdminCreateProductPage;

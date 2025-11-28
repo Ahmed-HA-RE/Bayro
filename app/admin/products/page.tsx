@@ -116,7 +116,7 @@ const AdminProductsPage = async ({
                         aria-label={`product-${product.id}-edit`}
                         asChild
                       >
-                        <Link href={`/admin/products/${product.id}/edit`}>
+                        <Link href={`/admin/products/${product.id}`}>
                           <PencilIcon />
                         </Link>
                       </Button>

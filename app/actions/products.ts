@@ -8,6 +8,7 @@ import {
 import { CreateProduct, UpdateProduct } from '@/types';
 import { revalidatePath } from 'next/cache';
 import cloudinary from '../config/cloudinary';
+import { convertToPlainObject } from '@/lib/utils';
 
 export const getLatestProducts = async () => {
   const data = await prisma.product.findMany({
@@ -64,6 +65,16 @@ export const getAllProducts = async ({
   }
 };
 
+export const getProductById = async (id: string) => {
+  const product = await prisma.product.findFirst({
+    where: { id },
+  });
+
+  if (!product) throw new Error('Product not found');
+
+  return convertToPlainObject(product);
+};
+
 export const deleteProductById = async (id: string) => {
   try {
     const product = await prisma.product.findFirst({
@@ -114,6 +125,8 @@ export const createProduct = async (
     if (!validateProduct.success) {
       throw new Error('Invalid product data');
     }
+    if (validateProduct.data.isFeatured && !images.bannerImage)
+      throw new Error('Banner image is required');
 
     // for products images
     for (const file of images.productsImages) {
@@ -178,6 +191,9 @@ export const updateProduct = async (
   images: { productsImages: File[]; bannerImage: File | null }
 ) => {
   try {
+    let imagesURL: string[] = [];
+    let bannerURL: string | null = null;
+
     const validateProduct = updateProductSchema.safeParse(data);
 
     if (!validateProduct.success) {
@@ -190,9 +206,65 @@ export const updateProduct = async (
 
     if (!product) throw new Error('Product not found');
 
+    // for products images
+    for (const file of images.productsImages) {
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
+      const image: string = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            { folder: 'bayro', overwrite: true },
+            function (error, result) {
+              if (error) {
+                reject(error);
+                return;
+              }
+              resolve(result?.secure_url as string);
+            }
+          )
+          .end(buffer);
+      });
+      imagesURL.push(image);
+    }
+
+    // for banner image
+    if (images.bannerImage) {
+      const arrayBuffer = await images.bannerImage.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
+      const image: string = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            { folder: 'bayro', overwrite: true },
+            function (error, result) {
+              if (error) {
+                reject(error);
+                return;
+              }
+              resolve(result?.secure_url as string);
+            }
+          )
+          .end(buffer);
+      });
+      bannerURL = image;
+    }
+
+    if (
+      validateProduct.data.isFeatured &&
+      !product.banner &&
+      !images.bannerImage
+    )
+      throw new Error('Banner image is required');
+
+    const updatedImages = imagesURL.length > 0 ? imagesURL : product.images;
+    const updatedBanner = bannerURL ? bannerURL : product.banner;
+
     await prisma.product.update({
       where: { id: validateProduct.data.id },
-      data: validateProduct.data,
+      data: {
+        ...validateProduct.data,
+        images: updatedImages,
+        banner: updatedBanner,
+      },
     });
 
     revalidatePath('/admin/products', 'page');

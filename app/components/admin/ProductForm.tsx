@@ -17,7 +17,6 @@ import slugify from 'slugify';
 import { createProduct, updateProduct } from '@/app/actions/products';
 import { useRouter } from 'next/navigation';
 import ProductDropzone from './ProductDropzone';
-import { Label } from '../ui/label';
 import { useState } from 'react';
 import { Checkbox } from '../ui/checkbox';
 import BannerFileUpload from './BannerFileUpload';
@@ -29,7 +28,7 @@ type ProductFormProps = {
 
 const ProductForm = ({ type, product }: ProductFormProps) => {
   const router = useRouter();
-  const [productsFiles, setProductsFiles] = useState<File[]>([]);
+  const [productsFiles, setProductsFiles] = useState<File[] | []>([]);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
 
   const form = useForm<CreateProduct>({
@@ -238,17 +237,24 @@ const ProductForm = ({ type, product }: ProductFormProps) => {
           <FieldLabel
             className={cn(
               'text-black',
-              productsFiles.length === 0 && 'text-destructive'
+              productsFiles.length === 0 &&
+                type === 'create' &&
+                'text-destructive'
             )}
           >
             Images
           </FieldLabel>
-          <ProductDropzone setProductsFiles={setProductsFiles} />
-          {form.formState.isSubmitted && productsFiles.length === 0 && (
-            <FieldError className='mt-2.5 text-destructive text-sm'>
-              At least one image is required
-            </FieldError>
-          )}
+          <ProductDropzone
+            setProductsFiles={setProductsFiles}
+            previewImages={product?.images}
+          />
+          {form.formState.isSubmitted &&
+            productsFiles.length === 0 &&
+            type === 'create' && (
+              <FieldError className='mt-2.5 text-destructive text-sm'>
+                At least one image is required
+              </FieldError>
+            )}
         </Field>
 
         {/* Add banner only when is featured is checked */}
@@ -257,14 +263,18 @@ const ProductForm = ({ type, product }: ProductFormProps) => {
             <FieldLabel
               className={cn(
                 'text-black',
-                productsFiles.length === 0 && 'text-destructive'
+                !bannerFile && !product?.banner && 'text-destructive'
               )}
             >
               Banner
             </FieldLabel>
-            <BannerFileUpload setBannerFile={setBannerFile} />
+            <BannerFileUpload
+              setBannerFile={setBannerFile}
+              preview={product?.banner}
+            />
             {form.formState.isSubmitted &&
               !bannerFile &&
+              !product?.banner &&
               form.watch('isFeatured') && (
                 <FieldError className='mt-2.5 text-destructive text-sm'>
                   At least one image is required

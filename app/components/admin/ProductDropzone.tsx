@@ -106,8 +106,10 @@ const getFilePreview = (file: {
 
 const ProductDropzone = ({
   setProductsFiles,
+  previewImages,
 }: {
   setProductsFiles: Dispatch<SetStateAction<File[]>>;
+  previewImages?: string[];
 }) => {
   const maxSizeMB = 8;
   const maxSize = maxSizeMB * 1024 * 1024; // 8MB default
