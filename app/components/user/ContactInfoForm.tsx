@@ -19,23 +19,38 @@ import { Spinner } from '../ui/spinner';
 import { Shipping } from '@/types';
 import { PhoneInput } from '../ui/phone-number-input';
 import { NativeSelect, NativeSelectOption } from '../ui/native-select';
-import { updateUserAddress } from '@/app/actions/auth';
+import {
+  updateUserAddress,
+  updateUserContactInfoAsAdmin,
+} from '@/app/actions/auth';
+import { useRouter } from 'next/navigation';
 
 type UserContactFormProps = {
   address: Shipping;
+  type?: 'admin';
+  userId?: string;
 };
 
-const UserContactForm = ({ address }: UserContactFormProps) => {
+const UserContactForm = ({ address, type, userId }: UserContactFormProps) => {
   const form = useForm<Shipping>({
     resolver: zodResolver(shippingSchema),
     defaultValues: address || '',
     mode: 'onSubmit',
   });
 
-  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const onSubmit = async (data: Shipping) => {
-    startTransition(async () => {
+    if (type === 'admin') {
+      const result = await updateUserContactInfoAsAdmin(userId!, data);
+
+      if (!result.success) {
+        destructiveToast(result.message);
+        return;
+      }
+      successToast(result.message);
+      setTimeout(() => router.push('/admin/users'), 1500);
+    } else {
       const result = await updateUserAddress(data);
 
       if (!result.success) {
@@ -44,7 +59,7 @@ const UserContactForm = ({ address }: UserContactFormProps) => {
       }
       successToast(result.message);
       setTimeout(() => window.location.reload(), 1500);
-    });
+    }
   };
 
   return (
@@ -160,9 +175,11 @@ const UserContactForm = ({ address }: UserContactFormProps) => {
           </FieldSet>
         </CardContent>
         <CardFooter className='self-end'>
-          <Button disabled={isPending}>
-            {isPending && <Spinner className='size-6' />}
-            {isPending ? 'Updating Profile...' : 'Update Profile'}
+          <Button disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && <Spinner className='size-6' />}
+            {form.formState.isSubmitting
+              ? 'Updating Profile...'
+              : 'Update Profile'}
           </Button>
         </CardFooter>
       </Card>

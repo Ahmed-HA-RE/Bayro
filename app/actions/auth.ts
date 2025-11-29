@@ -6,9 +6,11 @@ import {
   type RegisterUserForm,
   SignInUserForm,
   UpdateUserPassForm,
+  UpdateUserPubInfoAdminForm,
   registerSchema,
   signInSchema,
   updateUserPassSchema,
+  updateUserPubInfoAdminSchema,
   updateUserPubInfoSchema,
 } from '@/schema/userSchema';
 import { APIError, email, success } from 'better-auth';
@@ -418,12 +420,18 @@ export const getAllUsersForAdmin = async (page: number, limit: number = 10) => {
 
 export const deleteUserAsAdmin = async (id: string) => {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (session?.user.role !== 'admin')
+      throw new Error('You are not authorized to perform this action');
+
     const user = await prisma.user.findFirst({
       where: { id },
     });
 
     if (!user) throw new Error('User not found');
-
     await prisma.user.delete({
       where: { id },
     });
@@ -438,6 +446,13 @@ export const deleteUserAsAdmin = async (id: string) => {
 
 export const banUserAsAdmin = async (id: string) => {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (session?.user.role !== 'admin')
+      throw new Error('You are not authorized to perform this action');
+
     const user = await prisma.user.findFirst({
       where: { id },
     });
@@ -462,6 +477,13 @@ export const banUserAsAdmin = async (id: string) => {
 
 export const unbanUserAsAdmin = async (id: string) => {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (session?.user.role !== 'admin')
+      throw new Error('You are not authorized to perform this action');
+
     const user = await prisma.user.findFirst({
       where: { id },
     });
@@ -478,6 +500,111 @@ export const unbanUserAsAdmin = async (id: string) => {
     revalidatePath('/admin/users', 'page');
 
     return { success: true, message: 'User unbanned successfully' };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+};
+
+export const updateUserPublicInfoAsAdmin = async (
+  id: string,
+  data: UpdateUserPubInfoAdminForm,
+  image: File | FileMetadata | undefined
+) => {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (session?.user.role !== 'admin')
+      throw new Error('You are not authorized to perform this action');
+
+    let imageURL = '';
+
+    const user = await prisma.user.findFirst({
+      where: { id },
+    });
+
+    if (!user) throw new Error('User not found');
+
+    const validatedData = updateUserPubInfoAdminSchema.safeParse(data);
+
+    if (!validatedData.success) {
+      return { success: false, message: 'Some fields are invalid' };
+    }
+
+    if (validatedData.data.role === 'admin' && !user.emailVerified)
+      throw new Error('Cannot assign admin role to unverified email user');
+
+    if (image instanceof File) {
+      const arrayBuffer = await image.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
+      const result: string = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ folder: 'avatars' }, function (error, result) {
+            if (error) {
+              reject(error);
+              return;
+            }
+            resolve(result?.secure_url!);
+          })
+          .end(buffer);
+      });
+      imageURL = result;
+    }
+
+    await auth.api.adminUpdateUser({
+      body: {
+        userId: id,
+        data: {
+          ...validatedData.data,
+          image: imageURL || user.image,
+        },
+      },
+      headers: await headers(),
+    });
+
+    revalidatePath('/admin/users', 'page');
+
+    return { success: true, message: 'User updated successfully' };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+};
+
+export const updateUserContactInfoAsAdmin = async (
+  id: string,
+  data: Shipping
+) => {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (session?.user.role !== 'admin')
+      throw new Error('You are not authorized to perform this action');
+
+    const user = await prisma.user.findFirst({
+      where: { id },
+    });
+
+    if (!user) throw new Error('User not found');
+
+    const validateAddress = shippingSchema.safeParse(data);
+
+    if (!validateAddress.success) {
+      return { success: false, message: 'Some fields are invalid' };
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { address: validateAddress.data },
+    });
+
+    revalidatePath('/admin/users', 'page');
+    return {
+      success: true,
+      message: 'Contact information updated successfully',
+    };
   } catch (error) {
     return { success: false, message: (error as Error).message };
   }

@@ -1,4 +1,6 @@
-import z from 'zod';
+import { USERS_ROLES } from '@/lib/constants';
+import z, { email } from 'zod';
+import { shippingSchema } from './checkoutSchema';
 
 export const registerSchema = z
   .object({
@@ -80,3 +82,20 @@ export const updateUserPassSchema = z
   });
 
 export type UpdateUserPassForm = z.infer<typeof updateUserPassSchema>;
+
+// Update user info as admin
+export const updateUserPubInfoAdminSchema = z.object({
+  name: updateUserPubInfoSchema.shape.name,
+  bio: updateUserPubInfoSchema.shape.bio,
+  role: z.enum(USERS_ROLES, { error: 'Invalid user role' }),
+  image: z.string().optional().nullable(),
+});
+export type UpdateUserPubInfoAdminForm = z.infer<
+  typeof updateUserPubInfoAdminSchema
+>;
+
+// Update user contact info as admin
+export const updateUserContactAdminSchema = shippingSchema;
+export type UpdateUserContactAdminForm = z.infer<
+  typeof updateUserContactAdminSchema
+>;

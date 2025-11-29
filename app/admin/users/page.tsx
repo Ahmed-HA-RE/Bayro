@@ -9,7 +9,6 @@ import {
   TableRow,
 } from '@/app/components/ui/table';
 import { FaUsers } from 'react-icons/fa6';
-import { BookUser } from 'lucide-react';
 import Image from 'next/image';
 import { Badge } from '@/app/components/ui/badge';
 import { Button } from '@/app/components/ui/button';
@@ -89,14 +88,18 @@ const AdminUsersPage = async ({
                   </TableCell>
                   <TableCell className='text-left flex items-center gap-2'>
                     <Button size='sm' variant={'default'} asChild>
-                      <Link href={`/users/${user.id}`}>Edit</Link>
+                      <Link href={`/admin/users/${user.id}`}>Edit</Link>
                     </Button>
-                    <DeleteDialog
-                      id={user.id}
-                      action={deleteUserAsAdmin}
-                      type={'user'}
-                    />
-                    <ToggleBanUserButton user={user} />
+                    {user.role !== 'admin' && (
+                      <>
+                        <DeleteDialog
+                          id={user.id}
+                          action={deleteUserAsAdmin}
+                          type={'user'}
+                        />
+                        <ToggleBanUserButton user={user} />
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

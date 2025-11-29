@@ -7,3 +7,4 @@ export const APP_NAME = 'Bayro';
 export const LIMIT_LIST_PRODUCTS = 4;
 
 export const PAYMENT_METHODS = 'PayPal, Credit Card, CashOnDelivery';
+export const USERS_ROLES = ['user', 'admin'];

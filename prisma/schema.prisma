@@ -39,7 +39,7 @@ model User {
   name          String
   email         String
   emailVerified Boolean   @default(false)
-  image         String?
+  image         String?   @default("https://res.cloudinary.com/ahmed--dev/image/upload/v1755243182/default_avatar_7541d4c434.webp")
   role          String    @default("user")
   banned        Boolean   @default(false)
   banReason     String?

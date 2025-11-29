@@ -88,10 +88,7 @@ const UserMenu = ({
                   }
                 >
                   <Image
-                    src={
-                      session.user.image ||
-                      'https://res.cloudinary.com/ahmed--dev/image/upload/v1755243182/default_avatar_7541d4c434.webp'
-                    }
+                    src={session.user?.image as string}
                     alt='logo'
                     width={50}
                     height={50}

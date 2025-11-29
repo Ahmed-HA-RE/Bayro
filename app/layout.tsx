@@ -16,6 +16,21 @@ export const metadata: Metadata = {
     default: `${APP_NAME}`,
   },
   description: `Discover premium products at unbeatable prices on ${APP_NAME} a modern, secure, and seamless shopping experience in the UAE. Shop smart, shop ${APP_NAME}.`,
+
+  openGraph: {
+    siteName: APP_NAME,
+    title: `${APP_NAME} - Premium Products at Unbeatable Prices`,
+    description: `Discover premium products at unbeatable prices on ${APP_NAME} a modern, secure, and seamless shopping experience in the UAE. Shop smart, shop ${APP_NAME}.`,
+    type: 'website',
+    images: [
+      {
+        width: 1200,
+        height: 600,
+        url: 'https://bayro.ahmedrehandev.net/images/logo.png',
+        alt: APP_NAME,
+      },
+    ],
+  },
 };
 
 const RootLayout = ({
@@ -33,7 +48,7 @@ const RootLayout = ({
           disableTransitionOnChange
         >
           {children}
-          <Toaster />
+          <Toaster closeButton />
         </ThemeProvider>
       </body>
     </html>
