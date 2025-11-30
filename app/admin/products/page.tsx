@@ -51,7 +51,7 @@ const AdminProductsPage = async ({
 
   return (
     <section className='mt-4'>
-      <div className='flex flex-row justify-between products-center mb-4'>
+      <div className='flex flex-row justify-between items-center mb-4'>
         <h1 className='text-3xl md:text-4xl font-bold'>Products</h1>
         <div className='space-x-2'>
           {/* Clear query */}

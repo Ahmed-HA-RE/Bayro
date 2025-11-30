@@ -25,6 +25,7 @@ import { revalidatePath } from 'next/cache';
 import { FileMetadata } from '../../app/hooks/use-file-upload';
 import { UpdateUserPubInfo } from '@/types';
 import cloudinary from '../../app/config/cloudinary';
+import { Prisma } from '../generated/prisma';
 
 export const registerUser = async (values: RegisterUserForm) => {
   try {
@@ -388,7 +389,15 @@ export const updateUserPass = async (values: UpdateUserPassForm) => {
   }
 };
 
-export const getAllUsersForAdmin = async (page: number, limit: number = 10) => {
+export const getAllUsersForAdmin = async ({
+  page,
+  limit = 10,
+  query,
+}: {
+  page: number;
+  limit?: number;
+  query: string;
+}) => {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -401,6 +410,9 @@ export const getAllUsersForAdmin = async (page: number, limit: number = 10) => {
       query: {
         limit,
         offset: (page - 1) * limit,
+        filterOperator: query ? 'contains' : undefined,
+        filterField: query ? 'name' : undefined,
+        filterValue: query || undefined,
       },
       headers: await headers(),
     });

@@ -18,6 +18,12 @@ import { Suspense } from 'react';
 import PaginationControls from '@/app/components/Pagination';
 import DeleteDialog from '@/app/components/shared/DeleteDialog';
 import ToggleBanUserButton from '@/app/components/admin/ToggleBanUserButton';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/app/components/ui/tooltip';
+import { SearchX } from 'lucide-react';
 
 const AdminUsersPage = async ({
   searchParams,
@@ -25,12 +31,34 @@ const AdminUsersPage = async ({
   searchParams: Promise<{ [key: string]: string }>;
 }) => {
   const page = Number((await searchParams).page) || 1;
+  const query = (await searchParams).query || '';
 
-  const { users, totalPages } = await getAllUsersForAdmin(page);
+  const { users, totalPages } = await getAllUsersForAdmin({ page, query });
 
   return (
     <section className='mt-4'>
-      <h1 className='text-3xl md:text-4xl font-bold mb-4'>Users</h1>
+      <div className='flex flex-row justify-between items-center mb-4'>
+        <h1 className='text-3xl md:text-4xl font-bold'>Users</h1>
+        {query && (
+          <Tooltip>
+            <TooltipTrigger>
+              <Button
+                asChild
+                variant={'outline'}
+                size={'icon'}
+                className='border-black/50 dark:dark-border-color'
+              >
+                <Link href='/admin/users'>
+                  <SearchX />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Clear Filter</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
       {!users || users.length === 0 ? (
         <Alert className='bg-destructive dark:bg-destructive/60 border-none text-white max-w-md mx-auto'>
           <FaUsers />

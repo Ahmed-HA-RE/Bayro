@@ -261,7 +261,15 @@ export const getOrdersOverview = async () => {
 };
 
 // Get the orders for admin with pagination
-export const getOrdersForAdmin = async (page: number, limit: number = 10) => {
+export const getOrdersForAdmin = async ({
+  page,
+  limit = 10,
+  query,
+}: {
+  page: number;
+  limit?: number;
+  query: string;
+}) => {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -270,11 +278,16 @@ export const getOrdersForAdmin = async (page: number, limit: number = 10) => {
     if (session?.user.role !== 'admin')
       throw new Error('User is not authorized');
 
+    const queryFilter: Prisma.OrderWhereInput = query
+      ? { user: { name: { contains: query, mode: 'insensitive' } } }
+      : {};
+
     const orders = await prisma.order.findMany({
       orderBy: { createdAt: 'desc' },
       include: { user: { select: { name: true } } },
       take: limit,
       skip: (page - 1) * limit,
+      where: { ...queryFilter },
     });
 
     const totalOrders = await prisma.order.count();

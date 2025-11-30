@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { deleteOrderById, getOrdersForAdmin } from '@/lib/actions/order';
-import { Boxes, X } from 'lucide-react';
+import { Boxes, SearchX, X } from 'lucide-react';
 import { Alert, AlertTitle } from '@/app/components/ui/alert';
 import PaginationControls from '@/app/components/Pagination';
 import { Metadata } from 'next';
@@ -17,6 +17,11 @@ import { formatDateTime, formatId } from '@/lib/utils';
 import { Button } from '@/app/components/ui/button';
 import Link from 'next/link';
 import DeleteDialog from '@/app/components/shared/DeleteDialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/app/components/ui/tooltip';
 
 export const metadata: Metadata = {
   title: 'Admin Orders',
@@ -26,9 +31,10 @@ export const metadata: Metadata = {
 const AdminOrdersPage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<{ [key: string]: string }>;
 }) => {
   const page = Number((await searchParams).page) || 1;
+  const query = (await searchParams).query || '';
 
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -37,11 +43,32 @@ const AdminOrdersPage = async ({
   if (!session || session.user.role !== 'admin')
     throw new Error('User is not authorized');
 
-  const { orders, totalPages } = await getOrdersForAdmin(page);
+  const { orders, totalPages } = await getOrdersForAdmin({ page, query });
 
   return (
     <section className='mt-4'>
-      <h1 className='text-3xl md:text-4xl font-bold mb-4'>Orders</h1>
+      <div className='flex flex-row justify-between items-center mb-4'>
+        <h1 className='text-3xl md:text-4xl font-bold'>Orders</h1>
+        {query && (
+          <Tooltip>
+            <TooltipTrigger>
+              <Button
+                asChild
+                variant={'outline'}
+                size={'icon'}
+                className='border-black/50 dark:dark-border-color'
+              >
+                <Link href='/admin/orders'>
+                  <SearchX />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Clear Filter</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
       {!orders || orders.length === 0 ? (
         <Alert className='bg-destructive dark:bg-destructive/60 border-none text-white max-w-md mx-auto'>
           <Boxes />
@@ -54,6 +81,7 @@ const AdminOrdersPage = async ({
               <TableRow className='hover:bg-transparent'>
                 <TableHead className='px-4'>ID</TableHead>
                 <TableHead className='px-4'>DATE</TableHead>
+                <TableHead className='px-4'>BUYER</TableHead>
                 <TableHead className='px-4'>TOTAL</TableHead>
                 <TableHead className='px-4'>PAID</TableHead>
                 <TableHead className='px-4'>DELIVERED</TableHead>
@@ -70,6 +98,7 @@ const AdminOrdersPage = async ({
                   <TableCell className='px-4'>
                     {formatDateTime(order.createdAt).dateTime}
                   </TableCell>
+                  <TableCell className='px-4'>{order.user.name}</TableCell>
                   <TableCell className='px-4'>
                     <div className='flex gap-0.5 dark:text-orange-400'>
                       <p className='dirham-symbol'>&#xea;</p>
