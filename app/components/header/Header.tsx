@@ -8,7 +8,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import CategorySheet from './CategorySheet';
 import { auth } from '@/lib/auth';
-import prisma from '@/lib/prisma';
 import { headers } from 'next/headers';
 import { APP_NAME } from '@/lib/constants';
 
@@ -17,13 +16,6 @@ const Header = async () => {
     headers: await headers(),
   });
 
-  const [menDressShirtsCount, menSweatShirtsCount, menSneakersCount] =
-    await Promise.all([
-      prisma.product.count({ where: { category: "Men's Dress Shirts" } }),
-      prisma.product.count({ where: { category: "Men's Sweatshirts" } }),
-      prisma.product.count({ where: { category: "Men's Sneakers" } }),
-    ]);
-
   return (
     <header className='border-b dark:dark-border-color py-1'>
       <div className='max-w-7xl mx-auto px-4'>
@@ -31,11 +23,7 @@ const Header = async () => {
           {/* Left side */}
           <div className='flex flex-1/3 md:flex-1/2 items-center gap-1'>
             {/* Category Sheet */}
-            <CategorySheet
-              menDressShirtsCount={menDressShirtsCount}
-              menSweatShirtsCount={menSweatShirtsCount}
-              menSneakersCount={menSneakersCount}
-            />
+            <CategorySheet />
 
             <div className='flex items-center gap-6'>
               <Link

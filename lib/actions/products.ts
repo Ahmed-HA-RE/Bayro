@@ -289,3 +289,12 @@ export const updateProduct = async (
     return { success: false, message: (error as Error).message };
   }
 };
+
+export const getCategories = async () => {
+  const categories = await prisma.product.groupBy({
+    by: ['category'],
+    _count: true,
+  });
+
+  return categories;
+};
