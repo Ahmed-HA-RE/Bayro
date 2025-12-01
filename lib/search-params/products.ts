@@ -2,7 +2,7 @@ import { parseAsInteger, parseAsString, createLoader } from 'nuqs/server';
 
 export const productsSearchParams = {
   q: parseAsString.withDefault(''),
-  category: parseAsString.withDefault('all'),
+  category: parseAsString.withDefault(''),
   price: parseAsString.withDefault('all'),
   rate: parseAsString.withDefault('all'),
   sort: parseAsString.withDefault('newest'),

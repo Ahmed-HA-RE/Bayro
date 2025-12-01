@@ -1,5 +1,6 @@
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -35,13 +36,14 @@ const CategorySheet = async () => {
         </SheetHeader>
         <div className='grid flex-1 auto-rows-min gap-1 px-1 text-sm'>
           {categories.map((category, index) => (
-            <Link
-              key={index}
-              href={`/search?category=${category.category}`}
-              className='hover:bg-blue-50 text-black dark:text-white dark:hover:bg-gray-100/30 cursor-pointer rounded-md p-3'
-            >
-              {category.category} ({category.count})
-            </Link>
+            <SheetClose key={index} asChild>
+              <Link
+                href={`/products?category=${category.category}`}
+                className='hover:bg-blue-50 text-black dark:text-white dark:hover:bg-gray-100/30 cursor-pointer rounded-md p-3'
+              >
+                {category.category} ({category.count})
+              </Link>
+            </SheetClose>
           ))}
         </div>
       </SheetContent>

@@ -124,3 +124,6 @@ export const convertToNumber = (value: string | number): number => {
     return value;
   }
 };
+
+// Sorting products options
+export const PRODUCT_SORT_OPTIONS = ['newest', 'lowest', 'highest', 'rating'];

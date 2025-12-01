@@ -38,35 +38,41 @@ export const getProductBySlug = async (slug: string) => {
 type getAllProductsPrams = {
   page: number;
   query: string;
-  category: string;
+  category?: string;
+  sort?: string;
   limit?: number;
 };
 
 export const getAllProducts = async ({
   page,
   query,
+  sort,
   category,
   limit = 10,
 }: getAllProductsPrams) => {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-
-    if (session?.user.role !== 'admin')
-      throw new Error('User is not authorized');
-
     const queryFilter: Prisma.ProductWhereInput = query
       ? { name: { contains: query, mode: 'insensitive' } }
       : {};
 
     const categoryFilter: Prisma.ProductWhereInput =
-      category && category !== 'all' ? { category: { equals: category } } : {};
+      category && category !== '' ? { category: { equals: category } } : {};
+
+    const sortFilter: Prisma.ProductOrderByWithRelationInput =
+      sort === 'newest'
+        ? { createdAt: 'desc' }
+        : sort === 'lowest'
+          ? { createdAt: 'asc' }
+          : sort === 'highest'
+            ? { price: 'desc' }
+            : sort === 'rating'
+              ? { rating: 'desc' }
+              : {};
 
     const products = await prisma.product.findMany({
       take: limit,
       skip: (page - 1) * limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { ...sortFilter },
       where: { ...queryFilter, ...categoryFilter },
     });
 
