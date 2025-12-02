@@ -62,7 +62,7 @@ export const getAllProducts = async ({
       sort === 'newest'
         ? { createdAt: 'desc' }
         : sort === 'lowest'
-          ? { createdAt: 'asc' }
+          ? { price: 'asc' }
           : sort === 'highest'
             ? { price: 'desc' }
             : sort === 'rating'
@@ -77,7 +77,7 @@ export const getAllProducts = async ({
               lte: Number(price.split('-')[1]),
             },
           }
-        : !price?.includes('-')
+        : price && !price.includes('-')
           ? {
               price: { gte: Number(price) },
             }
@@ -93,6 +93,7 @@ export const getAllProducts = async ({
     if (!products) throw new Error('Products not found');
 
     const totalProducts = await prisma.product.count({
+      orderBy: { ...sortFilter },
       where: { ...queryFilter, ...categoryFilter, ...priceFilter },
     });
 

@@ -8,13 +8,34 @@ import { TriangleAlertIcon } from 'lucide-react';
 import ProductFilter from '@/app/components/products/ProductFilter';
 import { getCategories } from '@/lib/actions/products';
 import { getProductsCount } from '@/lib/actions/products';
+import { Metadata } from 'next';
 
 type ProductsPageProps = {
   searchParams: Promise<SearchParams>;
 };
 
+export const generateMetadata = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string }>;
+}): Promise<Metadata> => {
+  const { q, price, category } = await searchParams;
+
+  if (q || price || category) {
+    return {
+      title: `
+      ${q && 'Search ' + q} ${category ? ': Category ' + category : ''} ${price ? ': Price ' + price : ''}
+      `,
+    };
+  } else {
+    return {
+      title: 'Search Products',
+    };
+  }
+};
+
 const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
-  const { q, price, category, rate, sort, page } =
+  const { q, price, category, sort, page } =
     await loadSearchParams(searchParams);
 
   const data = await getAllProducts({ page, query: q, category, sort, price });
@@ -24,7 +45,15 @@ const ProductsPage = async ({ searchParams }: ProductsPageProps) => {
 
   return (
     <section className='mt-4'>
-      <ProductFilter categories={categories} totalProducts={totalProducts} />
+      <div className='mb-8'>
+        <h2 className='text-3xl font-bold tracking-tight text-balance'>
+          Product Catalog
+        </h2>
+        <p className='text-muted-foreground mt-2'>
+          Browse our collection of {totalProducts} products
+        </p>
+      </div>
+      <ProductFilter categories={categories} />
       {!data.products || data.products?.length === 0 ? (
         <Alert
           variant='destructive'

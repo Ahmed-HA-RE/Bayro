@@ -9,7 +9,6 @@ import CategorySheet from './CategorySheet';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { APP_NAME } from '@/lib/constants';
-import Search from '../products/ProductSearch';
 import { getCategories } from '@/lib/actions/products';
 
 const Header = async () => {
@@ -17,11 +16,9 @@ const Header = async () => {
     headers: await headers(),
   });
 
-  const categories = await getCategories();
-
   return (
     <header className='border-b dark:dark-border-color py-1'>
-      <div className='max-w-7xl mx-auto px-4'>
+      <div className='max-w-7xl mx-auto px-4 md:px-6'>
         <div className='flex h-16 items-center justify-between gap-2'>
           {/* Left side */}
           <div className='flex flex-1/5  items-center gap-1'>
@@ -46,8 +43,6 @@ const Header = async () => {
               </Link>
             </div>
           </div>
-          {/* Middle area */}
-          <Search categories={categories} />
           {/* Right side */}
           <div className='flex flex-1/4 md:flex-1/5 items-center justify-end gap-2 md:gap-4'>
             <div className='flex items-center md:gap-2'>

@@ -1,6 +1,4 @@
 'use client';
-
-import { useState } from 'react';
 import { Badge } from '@/app/components/ui/badge';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
@@ -13,29 +11,17 @@ import {
 } from '@/app/components/ui/dropdown-menu';
 import { Search, ChevronDown, X, SlidersHorizontal } from 'lucide-react';
 import { parseAsString, throttle, useQueryState } from 'nuqs';
-import { cn, productsPriceRanges } from '@/lib/utils';
+import { productsPriceRanges, PRODUCT_SORT_OPTIONS } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-
-const sortOptions = [
-  { id: 'featured', label: 'Featured' },
-  { id: 'newest', label: 'Newest' },
-  { id: 'price-low', label: 'Price: Low to High' },
-  { id: 'price-high', label: 'Price: High to Low' },
-  { id: 'rating', label: 'Customer Rating' },
-];
 
 type ProductFilterProps = {
   categories: {
     category: string;
     count: number;
   }[];
-  totalProducts: number;
 };
 
-const ProductFilter = ({ categories, totalProducts }: ProductFilterProps) => {
-  const [selectedPriceRange, setSelectedPriceRange] = useState('all');
-  const [selectedSort, setSelectedSort] = useState('featured');
-  const [searchQuery, setSearchQuery] = useState('');
+const ProductFilter = ({ categories }: ProductFilterProps) => {
   const router = useRouter();
 
   const [price, setPrice] = useQueryState(
@@ -47,6 +33,16 @@ const ProductFilter = ({ categories, totalProducts }: ProductFilterProps) => {
   );
 
   const [category, setCategory] = useQueryState('category', {
+    shallow: false,
+    limitUrlUpdates: throttle(300),
+  });
+
+  const [sort, setSort] = useQueryState('sort', {
+    shallow: false,
+    limitUrlUpdates: throttle(300),
+  });
+
+  const [q, setQ] = useQueryState('q', {
     shallow: false,
     limitUrlUpdates: throttle(300),
   });
@@ -69,27 +65,19 @@ const ProductFilter = ({ categories, totalProducts }: ProductFilterProps) => {
 
   return (
     <>
-      <div className='mb-8'>
-        <h2 className='text-3xl font-bold tracking-tight text-balance'>
-          Product Catalog
-        </h2>
-        <p className='text-muted-foreground mt-2'>
-          Browse our collection of {totalProducts} products
-        </p>
-      </div>
-
       {/* Horizontal Filter Bar */}
       <div className='mb-6 space-y-4'>
         {/* Search and Sort Row */}
         <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           {/* Search */}
-          <div className='relative max-w-md flex-1'>
+          <div className='relative md:max-w-md flex-1'>
             <Search className='text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2' />
             <Input
-              placeholder='Search products...'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className='pl-10'
+              className='h-9 focus-visible:border-blue-400 focus-visible:ring-blue-400 dark:focus-visible:border-blue-500 dark:focus-visible:ring-blue-500 dark:border-white dark:text-white dark:placeholder:text-gray-50/70 pl-10'
+              placeholder='Search...'
+              type='search'
+              value={q || ''}
+              onChange={(e) => setQ(e.target.value || null)}
             />
           </div>
 
@@ -98,19 +86,21 @@ const ProductFilter = ({ categories, totalProducts }: ProductFilterProps) => {
             <DropdownMenuTrigger asChild>
               <Button
                 variant='outline'
-                className='w-full cursor-pointer sm:w-auto'
+                className='w-full cursor-pointer sm:w-auto dark:dark-border-color'
               >
-                <SlidersHorizontal className='me-2 size-4' />
-                Sort: {sortOptions.find((s) => s.id === selectedSort)?.label}
-                <ChevronDown className='ms-2 size-4' />
+                <SlidersHorizontal className='size-4' />
+                Sort:{' '}
+                {PRODUCT_SORT_OPTIONS.find((x) => x.value === sort)?.label ||
+                  'Default'}
+                <ChevronDown className='size-4' />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end' className='w-56'>
-              {sortOptions.map((option) => (
+              {PRODUCT_SORT_OPTIONS.map((option) => (
                 <DropdownMenuItem
-                  key={option.id}
-                  onClick={() => setSelectedSort(option.id)}
-                  className={selectedSort === option.id ? 'bg-' : ''}
+                  key={option.value}
+                  onClick={() => setSort(option.value)}
+                  className='hover:bg-amber-400 hover:!text-white'
                 >
                   {option.label}
                 </DropdownMenuItem>
@@ -124,24 +114,27 @@ const ProductFilter = ({ categories, totalProducts }: ProductFilterProps) => {
           {/* Category Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='outline' size='sm' className='cursor-pointer'>
+              <Button
+                variant='outline'
+                size='sm'
+                className='dark:dark-border-color'
+              >
                 Category: {category === null ? 'All' : category}
                 <ChevronDown className='ms-2 size-4' />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className='w-56'>
-              <DropdownMenuItem onClick={() => setCategory(null)}>
+              <DropdownMenuItem
+                className='cursor-pointer hover:bg-amber-400 hover:!text-white'
+                onClick={() => setCategory(null)}
+              >
                 All
               </DropdownMenuItem>
               {categories.map((cat) => (
                 <DropdownMenuItem
                   key={cat.category}
                   onClick={() => setCategory(cat.category)}
-                  className={cn(
-                    category === cat.category
-                      ? 'bg-gray-200 dark:bg-accent hover:bg-gray-200 hover:text-black'
-                      : 'hover:bg-amber-400 hover:!text-white'
-                  )}
+                  className='hover:bg-amber-400 hover:!text-white'
                 >
                   <div className='flex w-full items-center justify-between'>
                     <span>{cat.category}</span>
@@ -157,7 +150,11 @@ const ProductFilter = ({ categories, totalProducts }: ProductFilterProps) => {
           {/* Price Range Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='outline' size='sm' className='cursor-pointer'>
+              <Button
+                variant='outline'
+                size='sm'
+                className='cursor-pointer dark:dark-border-color'
+              >
                 Price:{' '}
                 {!price
                   ? 'All'
@@ -170,11 +167,7 @@ const ProductFilter = ({ categories, totalProducts }: ProductFilterProps) => {
                 <DropdownMenuItem
                   key={range.id}
                   onClick={() => setPrice(range.value)}
-                  className={cn(
-                    price === range.value
-                      ? 'bg-gray-200 dark:bg-accent hover:bg-gray-200 hover:text-black'
-                      : 'hover:bg-amber-400 hover:!text-white'
-                  )}
+                  className={'hover:bg-amber-400 hover:!text-white'}
                 >
                   {range.label}
                 </DropdownMenuItem>

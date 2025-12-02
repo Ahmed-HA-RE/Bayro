@@ -16,12 +16,20 @@ import {
   FieldSet,
 } from '../ui/field';
 import { Input } from '../ui/input';
-import { NativeSelect, NativeSelectOption } from '../ui/native-select';
 import { destructiveToast, successToast, UAECITIES } from '@/lib/utils';
 import { PhoneInput } from '../ui/phone-number-input';
 import { Button } from '../ui/button';
 import { ArrowRight } from 'lucide-react';
 import { updateUserAddress } from '../../../lib/actions/auth';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 
 const ShippingAddressForm = ({ userAddress }: { userAddress: Shipping }) => {
   const [isPending, startTransition] = useTransition();
@@ -90,24 +98,28 @@ const ShippingAddressForm = ({ userAddress }: { userAddress: Shipping }) => {
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor={field.name}>City</FieldLabel>
                 <FieldContent>
-                  <NativeSelect
+                  <Select
                     aria-invalid={fieldState.invalid}
-                    className='border-black/50 dark:dark-border-color focus-visible:border-blue-500 focus-visible:ring-blue-500 placeholder:text-gray-500 dark:placeholder:text-gray-300'
                     value={field.value}
-                    onChange={(e) => field.onChange(e)}
+                    onValueChange={field.onChange}
                   >
-                    <NativeSelectOption value=''>
-                      Select City
-                    </NativeSelectOption>
-                    {UAECITIES.map((city) => (
-                      <NativeSelectOption key={city.value} value={city.value}>
-                        {city.label}
-                      </NativeSelectOption>
-                    ))}
-                  </NativeSelect>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
+                    <SelectTrigger
+                      id={field.name}
+                      className='cursor-pointer border-black/50 dark:dark-border-color focus-visible:border-blue-500 focus-visible:ring-blue-500'
+                    >
+                      <SelectValue placeholder='Select a city' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>City</SelectLabel>
+                        {UAECITIES.map((city) => (
+                          <SelectItem key={city.value} value={city.value}>
+                            {city.label}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FieldContent>
               </Field>
             )}

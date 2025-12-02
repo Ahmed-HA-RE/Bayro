@@ -126,7 +126,12 @@ export const convertToNumber = (value: string | number): number => {
 };
 
 // Sorting products options
-export const PRODUCT_SORT_OPTIONS = ['newest', 'lowest', 'highest', 'rating'];
+export const PRODUCT_SORT_OPTIONS = [
+  { value: 'newest', label: 'Newest' },
+  { value: 'lowest', label: 'Price: Low to High' },
+  { value: 'highest', label: 'Price: High to Low' },
+  { value: 'rating', label: 'Customer Rating' },
+];
 
 export const productsPriceRanges = [
   { id: 'all', label: 'All Prices', value: null },
