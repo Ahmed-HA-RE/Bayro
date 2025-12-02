@@ -3,7 +3,8 @@
 import * as React from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
-import { StarIcon, type LucideProps } from 'lucide-react';
+import { type LucideProps } from 'lucide-react';
+import { IoIosStar } from 'react-icons/io';
 
 import { cn } from '@/lib/utils';
 
@@ -29,7 +30,7 @@ const RATING_DEFAULTS = {
   maxStars: 5,
   size: 20,
   variant: 'default' as const,
-  icon: <StarIcon />,
+  icon: <IoIosStar />,
 } as const;
 
 // Types

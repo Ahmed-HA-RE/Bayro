@@ -3,6 +3,7 @@ import {
   baseProductSchema,
   baseReviewSchema,
   createProductSchema,
+  createReviewSchema,
   updateProductSchema,
 } from '@/schema/productSchema';
 import { cartItemSchema, cartSchema } from '@/schema/cartSchema';
@@ -46,5 +47,7 @@ export type UpdateProduct = z.infer<typeof updateProductSchema>;
 export type ProductReview = z.infer<typeof baseReviewSchema> & {
   id: string;
   createdAt: Date;
-  user: { name: string };
+  user: { name: string; emailVerified: boolean | null };
 };
+
+export type CreateReview = z.infer<typeof createReviewSchema>;

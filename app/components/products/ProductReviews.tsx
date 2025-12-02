@@ -1,14 +1,16 @@
-'use client';
-
-import { useState } from 'react';
 import { Alert, AlertTitle } from '../ui/alert';
 import Link from 'next/link';
 import { SERVER_URL } from '@/lib/constants';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
 import { Rating } from '../ui/star-rating';
 import ProductReviewForm from './ProductReviewForm';
+import {
+  getAllReviewsByProductId,
+  getUserReviewsByProductId,
+} from '@/lib/actions/review';
+import { headers } from 'next/headers';
+import { auth } from '@/lib/auth';
 
 type ProductReviewsProps = {
   productId: string;
@@ -110,44 +112,44 @@ const testimonials = [
   },
 ];
 
-const ProductReviews = ({
+const ProductReviews = async ({
   productId,
-  userId,
   productSlug,
 }: ProductReviewsProps) => {
-  const [reviews, setReviews] = useState(['hi']);
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  const reviews = await getAllReviewsByProductId(productId);
+  const userReview = await getUserReviewsByProductId(productId);
 
   return (
-    <div className='py-10 pt-14'>
-      {reviews.length === 0 ? (
-        <Alert className='max-w-md border-black dark:dark-border-color mx-auto'>
-          <AlertTitle>No reviews yet.</AlertTitle>
-        </Alert>
-      ) : (
-        <div className='space-y-6 md:spaec-y-8 lg:space-y-8'>
-          <div className='text-center flex flex-col justify-center items-center gap-4'>
-            <h2 className='relative z-1 font-semibold text-3xl lg:text-4xl'>
-              Customer Reviews
-              <span
-                className='from-primary absolute bottom-0 left-0 -z-1 h-0.5 w-full rounded-full bg-gradient-to-r to-transparent'
-                aria-hidden='true'
-              />
-            </h2>
-            {!userId ? (
-              <div className='block'>
-                Please{' '}
-                <Link
-                  href={`/signin?callbackUrl=${SERVER_URL}/product/${productSlug}`}
-                  className='text-blue-500 underline underline-offset-2'
-                >
-                  sign in
-                </Link>{' '}
-                to share your review
-              </div>
-            ) : (
-              <ProductReviewForm />
-            )}
+    <div className='space-y-6 md:spaec-y-8 lg:space-y-8 py-10 pt-14'>
+      <div className='text-center flex flex-col justify-center items-center gap-6'>
+        <h2 className='relative z-1 font-semibold text-3xl lg:text-4xl'>
+          Customer Reviews
+          <span
+            className='from-primary absolute bottom-0 left-0 -z-1 h-0.5 w-full rounded-full bg-gradient-to-r to-transparent'
+            aria-hidden='true'
+          />
+        </h2>
+        {!session?.user.id ? (
+          <div className='block'>
+            Please{' '}
+            <Link
+              href={`/signin?callbackUrl=${SERVER_URL}/product/${productSlug}`}
+              className='text-blue-500 underline underline-offset-2'
+            >
+              sign in
+            </Link>{' '}
+            to share your review
           </div>
+        ) : (
+          <ProductReviewForm userReview={userReview} />
+        )}
+        {reviews.length === 0 ? (
+          <p className='text-base text-center font-bold '>No reviews yet.</p>
+        ) : (
           <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 '>
             {testimonials.map((testimonial, index) => (
               <Card
@@ -200,8 +202,8 @@ const ProductReviews = ({
               </Card>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

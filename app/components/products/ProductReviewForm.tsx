@@ -3,7 +3,6 @@
 import { Button } from '../ui/button';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -13,19 +12,24 @@ import {
 import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { useForm, Controller, SubmitErrorHandler } from 'react-hook-form';
-import { createReviewSchema } from '@/schema/productSchema';
+import { useForm, Controller } from 'react-hook-form';
+import { baseReviewSchema, createReviewSchema } from '@/schema/productSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import { Rating } from '../ui/star-rating';
+import { IoIosStar } from 'react-icons/io';
 
-const ProductReviewForm = () => {
+const ProductReviewForm = ({
+  userReview,
+}: {
+  userReview: z.infer<typeof baseReviewSchema> | undefined;
+}) => {
   const form = useForm<z.infer<typeof createReviewSchema>>({
     resolver: zodResolver(createReviewSchema),
     defaultValues: {
-      title: '',
-      comment: '',
-      rating: 1,
+      title: userReview?.title || '',
+      comment: userReview?.comment || '',
+      rating: userReview?.rating || 1,
     },
     mode: 'onSubmit',
   });
@@ -105,6 +109,7 @@ const ProductReviewForm = () => {
                       size={30}
                       precision={0.5}
                       variant={'yellow'}
+                      icon={<IoIosStar />}
                       aria-invalid={fieldState.invalid}
                       value={field.value}
                       onValueChange={field.onChange}
@@ -117,9 +122,6 @@ const ProductReviewForm = () => {
               />
 
               <DialogFooter className='sm:justify-end'>
-                <DialogClose asChild>
-                  <Button variant='outline'>Cancel</Button>
-                </DialogClose>
                 <Button type='submit'>Submit</Button>
               </DialogFooter>
             </FieldGroup>

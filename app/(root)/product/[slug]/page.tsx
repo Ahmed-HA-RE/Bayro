@@ -49,11 +49,7 @@ const ProductDetailsPage = async ({
         </div>
       </div>
       {/* Reviews */}
-      <ProductReviews
-        productId={product.id}
-        userId={session?.user.id}
-        productSlug={product.slug}
-      />
+      <ProductReviews productId={product.id} productSlug={product.slug} />
     </section>
   );
 };
