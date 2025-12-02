@@ -20,9 +20,27 @@
   },
   "registries": {
     "@shadcn-studio": "https://shadcnstudio.com/r/{name}.json",
-    "@ss-components": "https://shadcnstudio.com/r/components/{name}.json",
-    "@ss-blocks": "https://shadcnstudio.com/r/blocks/{name}.json",
-    "@ss-themes": "https://shadcnstudio.com/r/themes/{name}.json",
+    "@ss-components": {
+      "url": "https://shadcnstudio.com/r/components/{name}.json",
+      "params": {
+        "email": "${SHADCN_EMAIL}",
+        "license_key": "${SHADCN_LICENSE_KEY}"
+      }
+    },
+    "@ss-blocks": {
+      "url": "https://shadcnstudio.com/r/blocks/{name}.json",
+      "params": {
+        "email": "${SHADCN_EMAIL}",
+        "license_key": "${SHADCN_LICENSE_KEY}"
+      }
+    },
+    "@ss-themes": {
+      "url": "https://shadcnstudio.com/r/themes/{name}.json",
+      "params": {
+        "email": "${SHADCN_EMAIL}",
+        "license_key": "${SHADCN_LICENSE_KEY}"
+      }
+    },
     "@hooks": "https://shadcn-hooks.vercel.app/r/{name}.json",
     "@reui": "https://reui.io/r/{name}.json",
     "@shadcnstore": {

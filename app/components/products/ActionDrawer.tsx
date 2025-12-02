@@ -95,8 +95,9 @@ const ActionDrawer = ({ product, cart }: ActionDrawerProps) => {
           Back to Home
         </Link>
         <Button
-          className='font-bold dark:bg-white dark:hover:bg-gray-200'
+          className='dark:bg-white dark:hover:bg-gray-200'
           onClick={() => setOpenDrawer(true)}
+          size={'sm'}
         >
           View Product Details
         </Button>

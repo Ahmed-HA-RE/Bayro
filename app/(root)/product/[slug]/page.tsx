@@ -4,6 +4,9 @@ import ActionDrawer from '@/app/components/products/ActionDrawer';
 import { convertToPlainObject } from '@/lib/utils';
 import ProductImages from '@/app/components/products/ProductImages';
 import { getMyCart } from '@/lib/actions/cart';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import ProductReviews from '@/app/components/products/ProductReviews';
 
 const ProductDetailsPage = async ({
   params,
@@ -14,6 +17,9 @@ const ProductDetailsPage = async ({
   const product = await getProductBySlug(slug);
   if (!product) return notFound();
   const cart = await getMyCart();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   return (
     <section>
@@ -42,6 +48,12 @@ const ProductDetailsPage = async ({
           </div>
         </div>
       </div>
+      {/* Reviews */}
+      <ProductReviews
+        productId={product.id}
+        userId={session?.user.id}
+        productSlug={product.slug}
+      />
     </section>
   );
 };
