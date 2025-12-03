@@ -1,5 +1,6 @@
 import { getFeaturedProducts } from '@/lib/actions/products';
 import FeaturedCarousel from '../components/FeaturedCarousel';
+import ProductCategory from '../components/products/ProductCategory';
 import ProductList from '../components/products/ProductList';
 
 const HomePage = async () => {
@@ -10,6 +11,7 @@ const HomePage = async () => {
         <FeaturedCarousel products={featuredProducts} />
       )}
       <ProductList />
+      <ProductCategory />
     </>
   );
 };

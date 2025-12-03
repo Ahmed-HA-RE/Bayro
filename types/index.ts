@@ -18,6 +18,7 @@ import { createAndUpdateReview } from '@/lib/actions/review';
 export type Product = z.infer<typeof baseProductSchema> & {
   id: string;
   rating: string;
+  numReviews: number;
 };
 
 export type CartItem = z.infer<typeof cartItemSchema>;

@@ -1,50 +1,55 @@
 import Image from 'next/image';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '../ui/card';
+import { Card, CardContent } from '../ui/card';
 import { Product } from '@/types';
 import Link from 'next/link';
+import { Badge } from '../ui/badge';
+import { StarIcon } from 'lucide-react';
 
 const ProductCard = ({ product }: { product: Product }) => {
   return (
-    <div className='flex *:rounded-none *:shadow-none max-xl:flex-col max-xl:*:not-last:border-b-0 max-xl:*:first:rounded-t-xl max-xl:*:last:rounded-b-xl xl:*:not-last:border-r-0 xl:*:first:rounded-l-xl xl:*:last:rounded-r-xl'>
-      <Card className='overflow-hidden pt-0 gap-4 border-gray-300 dark:dark-border-color w-full'>
-        <Link href={`/product/${product.slug}`}>
-          <CardContent className='px-0 h-60 flex items-stretch sm:h-70 overflow-hidden '>
+    <Card className='h-full gap-6 shadow-none'>
+      <CardContent className='flex flex-1 flex-col gap-6'>
+        <div className='shrink-0 overflow-hidden rounded-md'>
+          <Link href={`/product/${product.slug}`}>
             <Image
               src={product.images[0]}
               alt={product.name}
               width={0}
               height={0}
-              sizes='100vw'
               loading='eager'
-              className='w-full object-cover hover:scale-110 transition duration-200'
+              sizes='100vw'
+              className='w-full h-[200px] object-cover'
             />
-          </CardContent>
-          <CardHeader className='gap-1.5 px-3 py-4'>
-            <small className='font-medium'>{product.brand}</small>
-            <CardTitle className='text-lg truncate'>{product.name}</CardTitle>
-          </CardHeader>
-          <CardFooter className='flex flex-row  items-center justify-between w-full px-3'>
-            {/* rate */}
-            <p>{product.rating} Stars</p>
-            {/* price */}
-            {product.stock === 0 ? (
-              <span className='text-red-600 font-medium'>Out Of Stock</span>
-            ) : (
-              <div className='flex flex-row items-center justify-center gap-0.5 dark:text-orange-400'>
-                <p className='dirham-symbol'>&#xea;</p>
-                <p>{product.price}</p>
-              </div>
-            )}
-          </CardFooter>
-        </Link>
-      </Card>
-    </div>
+          </Link>
+        </div>
+        <div className='flex flex-1 flex-col gap-4'>
+          <div className='flex flex-1 flex-col justify-between gap-2'>
+            <Link href={product.slug}>
+              <h3 className='text-xl font-medium'>{product.name}</h3>
+            </Link>
+            <div className='flex items-center gap-3'>
+              <Badge className='rounded-sm bg-amber-400 text-white focus-visible:ring-amber-600/20 focus-visible:outline-none dark:focus-visible:ring-amber-400/40'>
+                <StarIcon className='size-3' />
+                {product.rating}
+              </Badge>
+              <a
+                href={`/product/${product.slug}`}
+                className='text-muted-foreground font-medium underline'
+              >
+                {product.numReviews} Reviews
+              </a>
+            </div>
+          </div>
+
+          <Link href={`/product/${product.slug}`}>
+            <div className='flex flex-row items-center gap-0.5 dark:text-orange-400 text-2xl font-semibold'>
+              <p className='dirham-symbol'>&#xea;</p>
+              <p>{product.price}</p>
+            </div>
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

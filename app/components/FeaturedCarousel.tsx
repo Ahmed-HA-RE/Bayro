@@ -13,7 +13,7 @@ import Link from 'next/link';
 
 const FeaturedCarousel = ({ products }: { products: Product[] }) => {
   return (
-    <section className='mt-2'>
+    <section className=''>
       <Carousel
         opts={{
           loop: true,

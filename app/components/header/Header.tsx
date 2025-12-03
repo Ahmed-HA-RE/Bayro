@@ -5,7 +5,6 @@ import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
 import Link from 'next/link';
 import Image from 'next/image';
-import CategorySheet from './CategorySheet';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { APP_NAME } from '@/lib/constants';
@@ -18,13 +17,10 @@ const Header = async () => {
 
   return (
     <header className='border-b dark:dark-border-color py-1'>
-      <div className='max-w-7xl mx-auto px-4 md:px-6'>
+      <div className='max-w-7xl mx-auto px-6'>
         <div className='flex h-16 items-center justify-between gap-2'>
           {/* Left side */}
           <div className='flex flex-1/5  items-center gap-1'>
-            {/* Category Sheet */}
-            <CategorySheet />
-
             <div className='flex items-center gap-6'>
               <Link
                 href='/'
@@ -37,9 +33,7 @@ const Header = async () => {
                   height={45}
                   loading='eager'
                 />
-                <h4 className='hidden md:block font-bold text-2xl pt-1'>
-                  {APP_NAME}
-                </h4>
+                <h4 className='font-bold text-2xl pt-1'>{APP_NAME}</h4>
               </Link>
             </div>
           </div>
