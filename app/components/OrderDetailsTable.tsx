@@ -30,6 +30,7 @@ import {
   confirmOrderPayment,
   updateOrderToPaidCOD,
   updateOrderToDelivered,
+  createCreditCardPayment,
 } from '../../lib/actions/order';
 import {
   PayPalScriptProvider,
@@ -39,6 +40,7 @@ import {
 import { Spinner } from './ui/spinner';
 import { Button } from './ui/button';
 import { useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 
 type OrderDetailsTableProps = {
   order: Order;
@@ -51,6 +53,8 @@ const OrderDetailsTable = ({
   paypalClientId,
   isAdmin,
 }: OrderDetailsTableProps) => {
+  const router = useRouter();
+
   // PayPal Loading Screen
   const PayPalLoadingScreen = () => {
     const [{ isPending }] = usePayPalScriptReducer();
@@ -81,6 +85,21 @@ const OrderDetailsTable = ({
         destructiveToast(res.message);
       } else {
         successToast(res.message);
+      }
+    });
+  };
+
+  const handleCreditPayment = async () => {
+    startTransition(async () => {
+      const res = await createCreditCardPayment(order.id);
+
+      if (!res.success) {
+        destructiveToast(res.message);
+        return;
+      }
+
+      if (res.redirect) {
+        router.push(res.redirect);
       }
     });
   };
@@ -276,11 +295,10 @@ const OrderDetailsTable = ({
                 </div>
               </div>
             </CardContent>
-            {/* Payment Buttons */}
 
             {/* PayPal */}
             {order.paymentMethod === 'PayPal' && !order.isPaid && (
-              <CardFooter className='px-6 md:px-3  w-full block'>
+              <CardFooter className='px-6 md:px-3 w-full block'>
                 {/* PayPal */}
                 <PayPalScriptProvider
                   options={{
@@ -298,13 +316,29 @@ const OrderDetailsTable = ({
               </CardFooter>
             )}
 
-            {/* Cash On Delivery */}
+            {/* Credit Card */}
+            {order.paymentMethod === 'Credit Card' && !order.isPaid && (
+              <CardFooter className='px-6 md:px-3 w-full block'>
+                <Button
+                  onClick={handleCreditPayment}
+                  size={'lg'}
+                  className='w-full'
+                  disabled={isPending}
+                >
+                  {isPending ? (
+                    <Spinner className='text-white size-6' />
+                  ) : (
+                    'Pay with Credit Card'
+                  )}
+                </Button>
+              </CardFooter>
+            )}
 
             {/* Marked as Paid */}
             {order.paymentMethod === 'CashOnDelivery' &&
               !order.isPaid &&
               isAdmin && (
-                <CardFooter className='px-6 md:px-3  w-full block'>
+                <CardFooter className='px-6 md:px-3 w-full block'>
                   <Button
                     onClick={handleMarkAsPaidCOD}
                     className='w-full text-base'

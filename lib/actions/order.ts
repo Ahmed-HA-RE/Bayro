@@ -7,10 +7,13 @@ import { orderSchema } from '@/schema/orderSchema';
 import { headers } from 'next/headers';
 import prisma from '@/lib/prisma';
 import { convertToPlainObject } from '@/lib/utils';
-import { Shipping } from '@/types';
+import { Order, Shipping } from '@/types';
 import { paypal } from '@/lib/paypal';
 import { revalidatePath } from 'next/cache';
 import { Prisma } from '@/lib/generated/prisma';
+import { stripe } from '../stripe';
+import Stripe from 'stripe';
+import { SERVER_URL } from '../constants';
 
 export const createOrder = async () => {
   try {
@@ -182,6 +185,53 @@ export const confirmOrderPayment = async (
   } catch (error) {
     console.log(error);
     throw new Error((error as Error).message);
+  }
+};
+
+// Create payments for credit card (stripe)
+export const createCreditCardPayment = async (orderId: string) => {
+  try {
+    const order = await prisma.order.findFirst({
+      where: { id: orderId },
+      include: { user: { select: { email: true } }, orderItems: true },
+    });
+
+    if (!order) throw new Error('No Order Found');
+
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
+      order.orderItems.map((item) => {
+        return {
+          price_data: {
+            unit_amount: Math.round(Number(item.price) * (1 + 0.05) * 100),
+            currency: 'aed',
+            product_data: {
+              name: item.name,
+              images: [item.image],
+            },
+          },
+          quantity: item.qty,
+        };
+      });
+
+    const paymentSession = await stripe.checkout.sessions.create({
+      line_items: lineItems,
+      mode: 'payment',
+      customer_email: order.user.email,
+      success_url: `${SERVER_URL}/payment/success`,
+      cancel_url: `${SERVER_URL}/order/${orderId}`,
+      branding_settings: {
+        display_name: 'Bayro',
+      },
+      metadata: { orderId: order.id },
+    });
+
+    revalidatePath(`/order/${orderId}`, 'page');
+    return {
+      success: true,
+      redirect: paymentSession.url,
+    };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
   }
 };
 
